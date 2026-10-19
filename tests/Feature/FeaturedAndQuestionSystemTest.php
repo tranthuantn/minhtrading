@@ -322,10 +322,20 @@ class FeaturedAndQuestionSystemTest extends TestCase
         $responseQuestions->assertStatus(200);
         $responseQuestions->assertSee('Câu hỏi tiêu biểu độc nhất');
 
-        // Student 2 (enrolled in Course 2, NOT Course 1) should NOT see Course 1 featured items
+        // Student 2 (enrolled in Course 2, NOT Course 1) CAN see Course 1 featured items (Cross-course Showcase)
         $responseStudent2 = $this->actingAs($this->student2)->get(route('student.featured.index', ['tab' => 'submissions']));
         $responseStudent2->assertStatus(200);
-        $responseStudent2->assertDontSee('Bài tập tiêu biểu độc nhất');
+        $responseStudent2->assertSee('Bài tập tiêu biểu độc nhất');
+
+        // Student 2 can view the featured submission detail directly
+        $responseSubDetail = $this->actingAs($this->student2)->get(route('student.submissions.show', $submission->id));
+        $responseSubDetail->assertStatus(200);
+        $responseSubDetail->assertSee('Bài tập tiêu biểu độc nhất');
+
+        // Student 2 can view the featured question detail directly
+        $responseQuestionDetail = $this->actingAs($this->student2)->get(route('student.questions.show', $question->id));
+        $responseQuestionDetail->assertStatus(200);
+        $responseQuestionDetail->assertSee('Câu hỏi tiêu biểu độc nhất');
 
         // Admin sees all in admin showcase
         $responseAdmin = $this->actingAs($this->admin)->get(route('admin.featured.index', ['tab' => 'submissions']));

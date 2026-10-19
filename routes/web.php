@@ -52,6 +52,7 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
 
     // Assignments
     Route::resource('assignments', Admin\AssignmentController::class);
+    Route::post('assignments/{assignment}/duplicate', [Admin\AssignmentController::class, 'duplicate'])->name('assignments.duplicate');
     Route::get('assignments-stats', [Admin\AssignmentController::class, 'stats'])->name('assignments.stats');
 
     // Submissions

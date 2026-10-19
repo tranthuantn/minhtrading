@@ -46,8 +46,8 @@
             <select name="course_id" 
                     onchange="this.form.submit()" 
                     class="px-3.5 py-2 rounded-xl bg-slate-800 border border-slate-700 text-xs text-white focus:outline-none focus:border-amber-500">
-                <option value="">Tất cả khóa học của tôi</option>
-                @foreach($enrolledCourses as $c)
+                <option value="">Tất cả khóa học</option>
+                @foreach($courses ?? $enrolledCourses as $c)
                     <option value="{{ $c->id }}" {{ $courseId == $c->id ? 'selected' : '' }}>
                         {{ Str::limit($c->title, 30) }}
                     </option>

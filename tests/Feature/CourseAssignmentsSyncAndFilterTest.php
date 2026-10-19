@@ -54,15 +54,13 @@ class CourseAssignmentsSyncAndFilterTest extends TestCase
         $this->course2->students()->attach($this->student->id, ['is_active' => true, 'enrolled_at' => now()]);
     }
 
-    public function test_creating_a_lesson_automatically_creates_corresponding_assignment(): void
+    public function test_creating_a_lesson_does_not_automatically_create_assignment(): void
     {
         $response = $this->actingAs($this->admin)->post(route('admin.courses.lessons.store', $this->course1->id), [
             'title' => 'Bài 1: Xác định cấu trúc thị trường',
             'content' => '<p>Hướng dẫn xác định đỉnh đáy</p>',
             'sort_order' => 1,
             'is_published' => 1,
-            'assignment_type' => 'analysis',
-            'assignment_requirements' => 'Vẽ 3 con sóng đẩy và 3 con sóng hồi',
         ]);
 
         $response->assertRedirect(route('admin.courses.show', $this->course1->id));
@@ -74,16 +72,38 @@ class CourseAssignmentsSyncAndFilterTest extends TestCase
         $lesson = Lesson::where('title', 'Bài 1: Xác định cấu trúc thị trường')->first();
         $this->assertNotNull($lesson);
 
-        // Verify assignment was automatically created
+        // Verify NO assignment was created automatically
+        $this->assertEquals(0, $lesson->assignments()->count());
+    }
+
+    public function test_admin_can_create_assignment_independently(): void
+    {
+        $lesson = $this->course1->lessons()->create([
+            'title' => 'Bài 1: Xác định cấu trúc thị trường',
+            'sort_order' => 1,
+            'is_published' => true,
+        ]);
+
+        $response = $this->actingAs($this->admin)->post(route('admin.assignments.store'), [
+            'lesson_id' => $lesson->id,
+            'title' => 'Bài tập thực hành độc lập',
+            'type' => 'analysis',
+            'description' => 'Mô tả bài tập do admin tự tạo',
+            'requirements' => 'Vẽ 3 con sóng đẩy và 3 con sóng hồi',
+            'due_date' => now()->addDays(7)->format('Y-m-d H:i:s'),
+        ]);
+
+        $assignment = Assignment::where('title', 'Bài tập thực hành độc lập')->first();
+        $this->assertNotNull($assignment);
+        $response->assertRedirect(route('admin.assignments.show', $assignment->id));
         $this->assertDatabaseHas('assignments', [
             'lesson_id' => $lesson->id,
-            'title' => 'Bài tập: Bài 1: Xác định cấu trúc thị trường',
+            'title' => 'Bài tập thực hành độc lập',
             'type' => 'analysis',
-            'requirements' => 'Vẽ 3 con sóng đẩy và 3 con sóng hồi',
         ]);
     }
 
-    public function test_updating_a_lesson_syncs_assignment(): void
+    public function test_updating_a_lesson_does_not_alter_assignments(): void
     {
         $lesson = $this->course1->lessons()->create([
             'title' => 'Bài 2: Vùng Supply Demand',
@@ -91,16 +111,14 @@ class CourseAssignmentsSyncAndFilterTest extends TestCase
             'is_published' => true,
         ]);
 
-        $lesson->assignments()->create([
-            'title' => 'Bài tập: Bài 2: Vùng Supply Demand',
+        $assignment = $lesson->assignments()->create([
+            'title' => 'Bài tập gốc không bị can thiệp',
             'description' => 'Mô tả ban đầu',
             'type' => 'analysis',
         ]);
 
         $response = $this->actingAs($this->admin)->put(route('admin.courses.lessons.update', [$this->course1->id, $lesson->id]), [
             'title' => 'Bài 2: Các vùng Cung Cầu quan trọng',
-            'assignment_title' => 'Bài tập: Các vùng Cung Cầu quan trọng',
-            'assignment_type' => 'backtest',
             'sort_order' => 2,
             'is_published' => 1,
         ]);
@@ -108,9 +126,8 @@ class CourseAssignmentsSyncAndFilterTest extends TestCase
         $response->assertRedirect(route('admin.courses.show', $this->course1->id));
 
         $this->assertDatabaseHas('assignments', [
-            'lesson_id' => $lesson->id,
-            'title' => 'Bài tập: Các vùng Cung Cầu quan trọng',
-            'type' => 'backtest',
+            'id' => $assignment->id,
+            'title' => 'Bài tập gốc không bị can thiệp',
         ]);
     }
 
@@ -237,5 +254,55 @@ class CourseAssignmentsSyncAndFilterTest extends TestCase
         $response->assertStatus(200);
         $response->assertSee('Bài tập Khóa 1');
         $response->assertSee($this->student->name);
+    }
+
+    public function test_admin_can_duplicate_assignment_to_another_course_with_one_click(): void
+    {
+        // Assignment in Course 1
+        $lesson1 = $this->course1->lessons()->create(['title' => 'Bài 1 Khóa 1', 'sort_order' => 1, 'is_published' => true]);
+        $originalAssignment = $lesson1->assignments()->create([
+            'title' => 'Đề bài tập Price Action Mẫu',
+            'description' => 'Mô tả chi tiết bài tập mẫu',
+            'requirements' => '1. Chụp ảnh M15 và H4\n2. Nêu rõ RR tối thiểu 1:2',
+            'type' => 'backtest',
+            'due_date' => now()->addDays(5),
+        ]);
+
+        // Target lesson in Course 2
+        $targetLesson = $this->course2->lessons()->create(['title' => 'Bài 2 Khóa 2', 'sort_order' => 2, 'is_published' => true]);
+
+        // 1-Click duplicate request
+        $response = $this->actingAs($this->admin)->post(route('admin.assignments.duplicate', $originalAssignment->id), [
+            'lesson_id' => $targetLesson->id,
+            'title' => 'Đề bài tập Price Action Mẫu (Khóa mới)',
+            'due_date' => now()->addDays(10)->format('Y-m-d H:i:s'),
+        ]);
+
+        $duplicated = Assignment::where('lesson_id', $targetLesson->id)->first();
+        $this->assertNotNull($duplicated);
+
+        $response->assertRedirect(route('admin.assignments.show', $duplicated->id));
+        $response->assertSessionHas('success');
+
+        // Verify content was cloned accurately
+        $this->assertEquals('Đề bài tập Price Action Mẫu (Khóa mới)', $duplicated->title);
+        $this->assertEquals($originalAssignment->description, $duplicated->description);
+        $this->assertEquals($originalAssignment->requirements, $duplicated->requirements);
+        $this->assertEquals($originalAssignment->type, $duplicated->type);
+        $this->assertEquals($targetLesson->id, $duplicated->lesson_id);
+    }
+
+    public function test_admin_create_page_contains_template_prefill_list(): void
+    {
+        $lesson = $this->course1->lessons()->create(['title' => 'Bài 1 Khóa 1', 'sort_order' => 1, 'is_published' => true]);
+        $assignment = $lesson->assignments()->create([
+            'title' => 'Đề bài mẫu kiểm tra',
+            'type' => 'analysis',
+        ]);
+
+        $response = $this->actingAs($this->admin)->get(route('admin.assignments.create'));
+        $response->assertStatus(200);
+        $response->assertSee('Tái sử dụng nhanh từ đề bài cũ');
+        $response->assertSee('Đề bài mẫu kiểm tra');
     }
 }

@@ -60,13 +60,18 @@ Tất cả tài khoản thử nghiệm bên dưới đều dùng chung mật kh�
      - **Chèn hình ảnh minh họa trực tiếp vào bài viết** (tải ảnh từ máy tính hoặc dán ảnh clipboard).
      - **Nhúng Link Video bài giảng:** Hỗ trợ link YouTube, Vimeo, Google Drive...
      - **Tải lên File đính kèm:** Đính kèm file PDF, Word, Excel, Slide giáo trình hoặc Cheat-sheet trading cho học viên tải về.
-   - **Tự động tạo bài tập tương ứng với bài học:** Số lượng bài tập tương ứng chính xác với số bài học trong khóa học. Khi thêm bài học mới, hệ thống tự động tạo 1 bài tập thực hành tương ứng (Giảng viên có thể tùy chỉnh tiêu đề, loại bài tập phân tích/backtest/vào lệnh, yêu cầu và hạn nộp ngay trong form bài học).
+   - **Quản lý Bài học Độc lập:** Soạn thảo văn bản rich text, định dạng heading/list, nhúng ảnh trực tiếp vào bài viết, video bài giảng (YouTube, Vimeo, Google Drive hỗ trợ nhúng xem trực tiếp) và file tài liệu đính kèm.
+   - **Tách biệt Logic Bài Học & Bài Tập:** Giảng viên chủ động tự tạo từng bài tập thực hành theo nhu cầu giảng dạy (`/admin/assignments/create`) thay vì tự động ép cứng mỗi bài học 1 bài tập. Form tạo/sửa bài học được tối ưu tinh gọn, loại bỏ các trường bài tập thừa.
    - **Sắp xếp thứ tự bài học (Lesson Reordering):** Cho phép Giảng viên điều chỉnh số thứ tự bài học (#1, #2, #3...) và lưu thứ tự để học viên học theo đúng lộ trình đào tạo chuẩn.
 
 4. **Quản Lý Gộp Bài Tập & Bài Nộp (`/admin/submissions` & `/admin/assignments`):**
+   - **Chủ động tạo đề bài tập linh hoạt:** Giảng viên tạo đề bài tập độc lập tại `/admin/assignments/create`, chọn bài học và khóa học áp dụng, thiết lập hình thức nộp (Phân tích / Backtest / Vào lệnh thực tế) và deadline.
+   - **⚡ Tái Sử Dụng & Nhân Bản Đề Bài Tập 1-Click (Assignment 1-Click Clone):**
+     - **Nhân bản 1-Click từ danh sách & chi tiết:** Tại mỗi dòng bài tập trong `/admin/assignments` và trang chi tiết `/admin/assignments/{id}`, Giảng viên chỉ cần bấm nút **📋 Nhân bản** -> Popup Modal hiện lên -> Chọn Khóa học đích & Bài học đích cần giao đề -> Bấm **"Xác nhận Nhân bản"**. Hệ thống lập tức sao chép nguyên vẹn: Tiêu đề, Loại bài, Mô tả và Yêu cầu thực hành chi tiết sang khóa mới.
+     - **Điền nhanh từ đề bài cũ (Template Pre-fill):** Trong form tạo mới `/admin/assignments/create`, bổ sung thanh chọn *"⚡ Tái sử dụng nhanh từ đề bài cũ"*. Khi chọn 1 đề có sẵn, form tự động điền ngay tiêu đề, loại bài, mô tả và yêu cầu để Giảng viên tinh chỉnh nhanh mà không cần gõ lại.
    - **Chia theo khóa học & Lọc đa năng:**
-     - Tab **"📋 Bài nộp của học viên":** Lọc theo Khóa học (`course_id`), trạng thái chấm, học viên, bài tập; chấm điểm thang 10 kèm nhận xét.
-     - Tab **"📝 Danh sách đề bài tập":** Danh sách bài tập được **chia theo từng khóa học** với tiêu đề bài học và bài tập tương ứng; bộ lọc nhanh theo Khóa học, Loại bài tập (Analysis / Backtest / Trade Entry), và Trạng thái nộp bài (Có bài chờ chấm / Đã chấm / Chưa có bài nộp).
+     - Tab **"📋 Bài nộp của học viên":** Lọc theo Khóa học (`course_id`), trạng thái chấm, học viên, bài tập; chấm điểm thang 10 kèm nhận xét và đánh giá tiêu biểu.
+     - Tab **"📝 Danh sách đề bài tập":** Danh sách bài tập được chia theo từng khóa học; bộ lọc nhanh theo Khóa học, Loại bài tập, và Trạng thái nộp bài.
      - Tab **"📈 Thống kê hoàn thành":** Báo cáo trực quan tỷ lệ nộp bài, điểm số trung bình, tỷ lệ hoàn thành theo từng lớp.
    - Giảng viên quản lý toàn bộ quy trình giao đề và chấm bài tại một nơi duy nhất.
 
@@ -83,7 +88,7 @@ Tất cả tài khoản thử nghiệm bên dưới đều dùng chung mật kh�
    - Trong quá trình chấm bài nộp (`/admin/submissions/{id}/review`), Giảng viên có thể tích chọn **"⭐ Đánh giá là BÀI TẬP TIÊU BIỂU"** và nhập ghi chú lý do tiêu biểu (ví dụ: "Phân tích SMC chuẩn chỉ, quản lý vốn chặt chẽ").
    - Giảng viên cũng có thể bật/tắt (toggle) trạng thái tiêu biểu trực tiếp từ trang chi tiết bài nộp (`/admin/submissions/{id}`).
    - Khi được đánh giá tiêu biểu, học viên sẽ nhận được thông báo chúc mừng vinh danh tự động từ hệ thống.
-   - Bài nộp tiêu biểu sẽ được đưa vào thư viện Showcase của lớp để các học viên khác cùng tham khảo và học hỏi.
+   - **Chia sẻ mở toàn hệ thống (Cross-course Sharing):** Bài nộp tiêu biểu sẽ được đưa vào thư viện Showcase chung để **toàn bộ học viên ở mọi khóa học (K15, K16, K17...) đều có thể tham khảo, nghiên cứu và học hỏi kinh nghiệm**, phá vỡ rào cản phân cách giữa các khóa.
 
 8. **Quản Lý & Giải Đáp Câu Hỏi Của Học Viên (`/admin/questions`):**
    - Theo dõi toàn bộ các thắc mắc của học viên được đặt theo từng bài học cụ thể.
@@ -127,8 +132,8 @@ Tất cả tài khoản thử nghiệm bên dưới đều dùng chung mật kh�
      - Trang thảo luận chi tiết (`/student/questions/{id}`) cho phép học viên và Giảng viên trao đổi, phản hồi nhiều lượt.
 
 3. **Gộp Quản Lý Bài Tập & Bài Đã Nộp (`/student/assignments`):**
-   - **Mỗi khóa học có số lượng bài tập tương ứng:** Số bài tập bằng đúng số bài học trong khóa học. Học viên học đến đâu làm bài tập đến đó.
-   - **Danh sách bài tập chia theo từng khóa học:** Mỗi khóa học được hiển thị trong một khung riêng biệt, có tiêu đề khóa học, badge số lượng bài tập = bài học, và thanh tiến độ hoàn thành trực quan.
+   - **Bài tập được Giảng viên thiết kế độc lập:** Mỗi bài tập được tạo tương ứng với nội dung kiến thức trọng tâm cần rèn luyện.
+   - **Danh sách bài tập chia theo từng khóa học:** Mỗi khóa học được hiển thị trong một khung riêng biệt, có tiêu đề khóa học, số lượng bài tập và thanh tiến độ hoàn thành trực quan.
    - **Bộ lọc khóa học & Bộ lọc trạng thái đồng bộ:**
      - **Lọc Khóa Học:** Cho phép chọn xem bài tập của một khóa học cụ thể hoặc tất cả các khóa học được cấp quyền.
      - **Lọc Trạng Thái:** Lọc nhanh tức thời: `Tất cả` | `Chưa nộp` | `Chờ chấm` | `Đã chấm` | `Cần sửa lại`.
@@ -137,13 +142,12 @@ Tất cả tài khoản thử nghiệm bên dưới đều dùng chung mật kh�
      - Hành động thông minh theo trạng thái: Nếu chưa nộp -> nút **"Làm bài ngay"**; Nếu đã nộp -> nút **"Xem bài & nhận xét"**; Nếu cần sửa lại -> nút **"Sửa & Nộp lại"**.
    - **Trang làm bài & xem kết quả tích hợp (`show.blade.php`):** Xem yêu cầu đề bài, nộp bài/sửa bài, và đọc toàn bộ nhận xét, điểm số, hướng dẫn khắc phục của Giảng viên trên cùng một trang.
 
-4. **Thư Viện Bài Tập & Câu Hỏi Tiêu Biểu - Showcase (`/student/featured`):**
-   - **Không gian học tập từ bài mẫu xuất sắc:** Nơi học viên có thể vào đọc và tham khảo các bài nộp đạt điểm tuyệt đối và những câu hỏi hay có tính đúc kết thực chiến cao.
-   - **Phân quyền chặt chẽ:** Học viên **chỉ thấy các bài tập và câu hỏi tiêu biểu thuộc các khóa học mà mình đã được cấp quyền học**.
+4. **Thư Viện Bài Tập & Câu Hỏi Tiêu Biểu - Showcase Mở Rộng (`/student/featured`):**
+   - **Chia sẻ mở toàn diện:** Học viên có thể xem **tất cả bài tập tiêu biểu và câu hỏi tiêu biểu của tất cả các khóa học** trong học viện để học hỏi kinh nghiệm, phương pháp phân tích biểu đồ và cách xử lý tình huống thực chiến xuất sắc từ các bạn học khác.
    - **2 Tab chuyên biệt:**
      - **Tab 1 - 📝 Bài tập tiêu biểu:** Hiển thị card bài làm mẫu, điểm số, phân tích của bạn học, ảnh biểu đồ phóng to được, và đặc biệt là nhận xét lý do vinh danh của Giảng viên.
      - **Tab 2 - ❓ Câu hỏi tiêu biểu:** Xem các thắc mắc hay về kỹ thuật giao dịch, ảnh biểu đồ đính kèm, lời giải đáp chuẩn mực của Giảng viên và lý do Giảng viên bình chọn.
-   - Bộ lọc theo từng khóa học của học viên.
+   - **Bộ lọc linh hoạt:** Lọc theo từng khóa học hoặc xem tất cả khóa học trên toàn hệ thống.
 
 5. **Quản Lý Nhật Ký Backtest (`/student/backtests`):**
    - Ghi chép dữ liệu các lệnh luyện tập trong quá khứ (Replay mode).

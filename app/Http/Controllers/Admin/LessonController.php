@@ -122,21 +122,8 @@ class LessonController extends Controller
             'is_published' => $request->boolean('is_published', true),
         ]);
 
-        // Mỗi bài học trong khóa học luôn có bài tập thực hành tương ứng
-        $assignmentType = in_array($request->input('assignment_type'), ['analysis', 'backtest', 'trade_entry'])
-            ? $request->input('assignment_type')
-            : 'analysis';
-
-        $lesson->assignments()->create([
-            'title' => $request->input('assignment_title') ?: ('Bài tập: ' . $lesson->title),
-            'description' => $request->input('assignment_description') ?: ('Thực hành áp dụng kiến thức từ bài học "' . $lesson->title . '".'),
-            'requirements' => $request->input('assignment_requirements') ?: "1. Xem kỹ nội dung lý thuyết và video bài học.\n2. Thực hành phân tích biểu đồ trên TradingView theo nội dung bài học.\n3. Chụp ảnh màn hình đính kèm và nêu rõ lý do nhận định trước khi nộp.",
-            'due_date' => $request->filled('assignment_due_date') ? $request->input('assignment_due_date') : now()->addDays(7),
-            'type' => $assignmentType,
-        ]);
-
         return redirect()->route('admin.courses.show', $courseObj->id)
-            ->with('success', 'Đã thêm bài học "' . $lesson->title . '" và tạo bài tập thực hành tương ứng thành công.');
+            ->with('success', 'Đã thêm bài học "' . $lesson->title . '" thành công.');
     }
 
     /**
@@ -240,42 +227,8 @@ class LessonController extends Controller
             'is_published' => $request->boolean('is_published'),
         ]);
 
-        // Đảm bảo bài học luôn có bài tập thực hành tương ứng
-        $assignment = $lesson->assignments()->first();
-        if ($assignment) {
-            $assignmentUpdate = [];
-            if ($request->filled('assignment_title')) {
-                $assignmentUpdate['title'] = $request->input('assignment_title');
-            } elseif (str_starts_with($assignment->title, 'Bài tập: ')) {
-                $assignmentUpdate['title'] = 'Bài tập: ' . $lesson->title;
-            }
-            if ($request->filled('assignment_description')) {
-                $assignmentUpdate['description'] = $request->input('assignment_description');
-            }
-            if ($request->filled('assignment_requirements')) {
-                $assignmentUpdate['requirements'] = $request->input('assignment_requirements');
-            }
-            if ($request->filled('assignment_due_date')) {
-                $assignmentUpdate['due_date'] = $request->input('assignment_due_date');
-            }
-            if ($request->filled('assignment_type') && in_array($request->input('assignment_type'), ['analysis', 'backtest', 'trade_entry'])) {
-                $assignmentUpdate['type'] = $request->input('assignment_type');
-            }
-            if (!empty($assignmentUpdate)) {
-                $assignment->update($assignmentUpdate);
-            }
-        } else {
-            $lesson->assignments()->create([
-                'title' => $request->input('assignment_title') ?: ('Bài tập: ' . $lesson->title),
-                'description' => $request->input('assignment_description') ?: ('Thực hành áp dụng kiến thức từ bài học "' . $lesson->title . '".'),
-                'requirements' => $request->input('assignment_requirements') ?: "1. Xem kỹ nội dung lý thuyết và video bài học.\n2. Thực hành phân tích biểu đồ trên TradingView theo nội dung bài học.\n3. Chụp ảnh màn hình đính kèm và nêu rõ lý do nhận định trước khi nộp.",
-                'due_date' => $request->filled('assignment_due_date') ? $request->input('assignment_due_date') : now()->addDays(7),
-                'type' => in_array($request->input('assignment_type'), ['analysis', 'backtest', 'trade_entry']) ? $request->input('assignment_type') : 'analysis',
-            ]);
-        }
-
         return redirect()->route('admin.courses.show', $newCourseId)
-            ->with('success', 'Đã cập nhật bài học "' . $lesson->title . '" và đồng bộ bài tập tương ứng thành công.');
+            ->with('success', 'Đã cập nhật bài học "' . $lesson->title . '" thành công.');
     }
 
     /**

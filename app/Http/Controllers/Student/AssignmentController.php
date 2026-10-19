@@ -226,12 +226,24 @@ class AssignmentController extends Controller
     }
 
     /**
-     * Show a specific submission - redirects to unified assignment page.
+     * Show a specific submission.
+     * If it is a featured submission, any student can view it to learn.
+     * If it is the student's own submission, they can also view it.
      */
-    public function showSubmission(int $id): RedirectResponse
+    public function showSubmission(int $id): View|RedirectResponse
     {
-        $submission = Submission::where('user_id', auth()->id())->findOrFail($id);
+        $submission = Submission::with([
+            'assignment.lesson.course',
+            'reviews.reviewer',
+            'student',
+            'latestReview.reviewer',
+        ])->findOrFail($id);
 
-        return redirect()->route('student.assignments.show', $submission->assignment_id);
+        $isOwner = ($submission->user_id === auth()->id() || $submission->student_id === auth()->id());
+        $isFeatured = (bool) $submission->is_featured;
+
+        abort_if(! $isOwner && ! $isFeatured, 403, 'Bạn không có quyền xem bài nộp này.');
+
+        return view('student.submissions.show', compact('submission', 'isOwner', 'isFeatured'));
     }
 }

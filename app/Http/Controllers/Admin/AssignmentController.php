@@ -66,7 +66,7 @@ class AssignmentController extends Controller
 
         $assignments = $query->latest()->paginate(25)->withQueryString();
         $assignmentsByCourse = $assignments->getCollection()->groupBy(fn($a) => $a->lesson?->course_id ?? 0);
-        $courses = Course::withCount(['lessons', 'assignments'])->orderBy('sort_order')->get();
+        $courses = Course::withCount(['lessons', 'assignments'])->with(['lessons' => fn($q) => $q->orderBy('sort_order')])->orderBy('sort_order')->get();
 
         return view('admin.assignments.index', compact('assignments', 'assignmentsByCourse', 'courses'));
     }
@@ -76,10 +76,16 @@ class AssignmentController extends Controller
      */
     public function create(Request $request): View
     {
-        $courses = Course::with('lessons')->orderBy('sort_order')->get();
+        $courses = Course::with(['lessons' => fn($q) => $q->orderBy('sort_order')])->orderBy('sort_order')->get();
         $selectedLessonId = $request->input('lesson_id');
+        $existingAssignments = Assignment::with('lesson.course')->latest()->get();
 
-        return view('admin.assignments.create', compact('courses', 'selectedLessonId'));
+        $selectedTemplate = null;
+        if ($request->filled('template_id')) {
+            $selectedTemplate = Assignment::find($request->input('template_id'));
+        }
+
+        return view('admin.assignments.create', compact('courses', 'selectedLessonId', 'existingAssignments', 'selectedTemplate'));
     }
 
     /**
@@ -90,21 +96,25 @@ class AssignmentController extends Controller
         $validated = $request->validate([
             'lesson_id' => ['required', 'exists:lessons,id'],
             'title' => ['required', 'string', 'max:255'],
-            'description' => ['required', 'string'],
-            'type' => ['required', 'string', 'in:chart_analysis,trade_review,backtest_quiz,homework,other'],
-            'points' => ['required', 'integer', 'min:1', 'max:1000'],
+            'description' => ['nullable', 'string'],
+            'requirements' => ['nullable', 'string'],
+            'type' => ['required', 'string'],
             'due_date' => ['nullable', 'date'],
-            'is_active' => ['nullable', 'boolean'],
         ]);
+
+        $type = match ($validated['type']) {
+            'backtest', 'backtest_quiz' => 'backtest',
+            'trade_entry', 'trade_review' => 'trade_entry',
+            default => 'analysis',
+        };
 
         $assignment = Assignment::create([
             'lesson_id' => $validated['lesson_id'],
             'title' => $validated['title'],
-            'description' => $validated['description'],
-            'type' => $validated['type'],
-            'points' => $validated['points'],
+            'description' => $validated['description'] ?? null,
+            'requirements' => $validated['requirements'] ?? null,
+            'type' => $type,
             'due_date' => $validated['due_date'] ?? null,
-            'is_active' => $request->boolean('is_active', true),
         ]);
 
         return redirect()->route('admin.assignments.show', $assignment->id)
@@ -130,7 +140,9 @@ class AssignmentController extends Controller
             'average_score' => round((float) ($assignment->submissions()->whereNotNull('score')->avg('score') ?? 0), 1),
         ];
 
-        return view('admin.assignments.show', compact('assignment', 'submissions', 'stats'));
+        $courses = Course::with(['lessons' => fn($q) => $q->orderBy('sort_order')])->orderBy('sort_order')->get();
+
+        return view('admin.assignments.show', compact('assignment', 'submissions', 'stats', 'courses'));
     }
 
     /**
@@ -154,21 +166,25 @@ class AssignmentController extends Controller
         $validated = $request->validate([
             'lesson_id' => ['required', 'exists:lessons,id'],
             'title' => ['required', 'string', 'max:255'],
-            'description' => ['required', 'string'],
-            'type' => ['required', 'string', 'in:chart_analysis,trade_review,backtest_quiz,homework,other'],
-            'points' => ['required', 'integer', 'min:1', 'max:1000'],
+            'description' => ['nullable', 'string'],
+            'requirements' => ['nullable', 'string'],
+            'type' => ['required', 'string'],
             'due_date' => ['nullable', 'date'],
-            'is_active' => ['nullable', 'boolean'],
         ]);
+
+        $type = match ($validated['type']) {
+            'backtest', 'backtest_quiz' => 'backtest',
+            'trade_entry', 'trade_review' => 'trade_entry',
+            default => 'analysis',
+        };
 
         $assignment->update([
             'lesson_id' => $validated['lesson_id'],
             'title' => $validated['title'],
-            'description' => $validated['description'],
-            'type' => $validated['type'],
-            'points' => $validated['points'],
+            'description' => $validated['description'] ?? null,
+            'requirements' => $validated['requirements'] ?? null,
+            'type' => $type,
             'due_date' => $validated['due_date'] ?? null,
-            'is_active' => $request->boolean('is_active'),
         ]);
 
         return redirect()->route('admin.assignments.show', $assignment->id)
@@ -252,5 +268,38 @@ class AssignmentController extends Controller
         }
 
         return view('admin.assignments.stats', compact('totalStudents', 'assignmentStats', 'chartData'));
+    }
+
+    /**
+     * Duplicate an existing assignment to another lesson/course with 1-click.
+     */
+    public function duplicate(Request $request, Assignment|int $assignment): RedirectResponse
+    {
+        $assignment = $assignment instanceof Assignment
+            ? $assignment
+            : Assignment::findOrFail($assignment);
+
+        $validated = $request->validate([
+            'lesson_id' => ['required', 'exists:lessons,id'],
+            'title' => ['nullable', 'string', 'max:255'],
+            'due_date' => ['nullable', 'date'],
+        ]);
+
+        $newTitle = !empty($validated['title']) ? $validated['title'] : $assignment->title;
+        $targetLesson = Lesson::with('course')->findOrFail($validated['lesson_id']);
+
+        $newAssignment = Assignment::create([
+            'lesson_id' => $targetLesson->id,
+            'title' => $newTitle,
+            'description' => $assignment->description,
+            'requirements' => $assignment->requirements,
+            'type' => $assignment->type,
+            'due_date' => !empty($validated['due_date']) ? $validated['due_date'] : ($assignment->due_date ? now()->addDays(7) : null),
+        ]);
+
+        $courseName = $targetLesson->course->title ?? 'Khóa học';
+
+        return redirect()->route('admin.assignments.show', $newAssignment->id)
+            ->with('success', "Đã nhân bản đề bài tập sang bài \"{$targetLesson->title}\" ({$courseName}) thành công!");
     }
 }

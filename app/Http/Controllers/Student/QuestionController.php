@@ -81,9 +81,10 @@ class QuestionController extends Controller
         $student = $request->user();
         $question->load(['lesson.course', 'user', 'answers.user']);
 
-        // Học viên phải có quyền truy cập khóa học của bài học đó
+        // Cho phép xem nếu là câu hỏi tiêu biểu (chia sẻ toàn hệ thống) HOẶC học viên có quyền truy cập khóa học
+        $hasAccess = (bool) $question->is_featured || $student->hasCourseAccess($question->lesson->course);
         abort_if(
-            ! $student->hasCourseAccess($question->lesson->course),
+            ! $hasAccess,
             403,
             'Bạn không có quyền xem câu hỏi này.'
         );
