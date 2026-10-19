@@ -112,6 +112,12 @@ Tất cả tài khoản thử nghiệm bên dưới đều dùng chung mật kh�
 11. **Gửi Thông Báo (Notifications):**
     - Gửi thông báo đến toàn thể lớp học hoặc đích danh một học viên cụ thể (thông báo lịch học, nhắc hạn nộp bài tập, chia sẻ góc nhìn thị trường).
 
+12. **Thanh Menu Điều Hướng Thông Minh (Collapsible Sidebar):**
+    - Trang bị nút thu gọn / mở rộng menu (`«` / `»`) linh hoạt trên thanh Top Navbar và đầu thanh Sidebar.
+    - Chế độ thu gọn (Mini Sidebar - 80px) giúp mở rộng không gian xem biểu đồ nến TradingView, bảng dữ liệu lớn và tài liệu bài học.
+    - Tự động lưu trạng thái thu gọn vào trình duyệt (`localStorage`) để duy trì khi chuyển trang.
+    - Hỗ trợ phím tắt tiện lợi: **`Ctrl + B`** để đóng/mở nhanh tức thì.
+
 ---
 
 ### B. Phân Hệ Dành Cho Học Viên (Student)
