@@ -81,12 +81,12 @@
                 <a href="{{ Route::has('admin.dashboard') ? route('admin.dashboard') : url('/admin/dashboard') }}" 
                    class="flex items-center gap-3 group overflow-hidden"
                    :class="sidebarCollapsed ? 'lg:justify-center lg:w-full' : ''">
-                    <div class="w-10 h-10 shrink-0 rounded-xl bg-gradient-to-tr from-emerald-500 to-sky-500 flex items-center justify-center text-slate-950 font-black shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition-transform"
-                         :title="sidebarCollapsed ? 'MinhTrading PRO' : ''">
-                        <svg class="w-6 h-6 text-slate-950" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"></path>
-                        </svg>
-                    </div>
+                    
+                   <div class="w-10 h-10 shrink-0 rounded-full bg-gradient-to-tr from-emerald-500 to-sky-500 flex items-center justify-center text-slate
+-950 font-black shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition-transform">
+                    <img src="{{ asset('icon.jfif') }}" alt="MinhTrading" class="w-full h-full object-cover rounded-full">
+                </div>
+
                     <div :class="sidebarCollapsed ? 'lg:hidden' : 'block'" class="transition-opacity duration-200">
                         <div class="text-base font-bold tracking-tight text-white flex items-center gap-1.5 whitespace-nowrap">
                             MinhTrading
@@ -126,8 +126,38 @@
                     <svg class="w-5 h-5 shrink-0 {{ request()->routeIs('admin.dashboard') ? 'text-emerald-400' : 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
                     </svg>
-                    <span :class="sidebarCollapsed ? 'lg:hidden' : 'block'" class="truncate">📊 Dashboard</span>
+                    <span :class="sidebarCollapsed ? 'lg:hidden' : 'block'" class="truncate"> Dashboard</span>
                 </a>
+
+
+
+
+                <div :class="sidebarCollapsed ? 'lg:hidden' : 'block'" class="pt-4 px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Bài tập và hỏi đáp</div>
+                <div :class="sidebarCollapsed ? 'hidden lg:block' : 'hidden'" class="my-2 border-t border-slate-800 mx-1"></div>
+
+                <!-- Assignments & Submissions -->
+                <a href="{{ Route::has('admin.submissions.index') ? route('admin.submissions.index') : url('/admin/submissions') }}" 
+                   :title="sidebarCollapsed ? 'Bài tập & Bài nộp' : ''"
+                   :class="sidebarCollapsed ? 'lg:justify-center lg:px-2' : ''"
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 {{ request()->routeIs('admin.assignments.*') || request()->routeIs('admin.submissions.*') ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' : 'text-slate-300 hover:bg-slate-800/70 hover:text-white' }}">
+                    <svg class="w-5 h-5 shrink-0 {{ request()->routeIs('admin.assignments.*') || request()->routeIs('admin.submissions.*') ? 'text-emerald-400' : 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
+                    </svg>
+                    <span :class="sidebarCollapsed ? 'lg:hidden' : 'block'" class="truncate"> Bài tập & Bài nộp</span>
+                </a>
+
+                <!-- Questions Q&A -->
+                <a href="{{ route('admin.questions.index') }}" 
+                   :title="sidebarCollapsed ? 'Hỏi đáp học viên' : ''"
+                   :class="sidebarCollapsed ? 'lg:justify-center lg:px-2' : ''"
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 {{ request()->routeIs('admin.questions.*') ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' : 'text-slate-300 hover:bg-slate-800/70 hover:text-white' }}">
+                    <svg class="w-5 h-5 shrink-0 {{ request()->routeIs('admin.questions.*') ? 'text-emerald-400' : 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
+                    </svg>
+                    <span :class="sidebarCollapsed ? 'lg:hidden' : 'block'" class="truncate"> Hỏi đáp học viên</span>
+                </a>
+
+
 
                 <div :class="sidebarCollapsed ? 'lg:hidden' : 'block'" class="pt-4 px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Đào tạo & Quản lý</div>
                 <div :class="sidebarCollapsed ? 'hidden lg:block' : 'hidden'" class="my-2 border-t border-slate-800 mx-1"></div>
@@ -140,7 +170,7 @@
                     <svg class="w-5 h-5 shrink-0 {{ request()->routeIs('admin.students.*') ? 'text-emerald-400' : 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
                     </svg>
-                    <span :class="sidebarCollapsed ? 'lg:hidden' : 'block'" class="truncate">👥 Quản lý học viên</span>
+                    <span :class="sidebarCollapsed ? 'lg:hidden' : 'block'" class="truncate"> Quản lý học viên</span>
                 </a>
 
                 <!-- Courses -->
@@ -151,42 +181,12 @@
                     <svg class="w-5 h-5 shrink-0 {{ request()->routeIs('admin.courses.*') ? 'text-emerald-400' : 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
                     </svg>
-                    <span :class="sidebarCollapsed ? 'lg:hidden' : 'block'" class="truncate">📚 Khóa học</span>
+                    <span :class="sidebarCollapsed ? 'lg:hidden' : 'block'" class="truncate"> Khóa học</span>
                 </a>
 
-                <!-- Assignments & Submissions -->
-                <a href="{{ Route::has('admin.submissions.index') ? route('admin.submissions.index') : url('/admin/submissions') }}" 
-                   :title="sidebarCollapsed ? 'Bài tập & Bài nộp' : ''"
-                   :class="sidebarCollapsed ? 'lg:justify-center lg:px-2' : ''"
-                   class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 {{ request()->routeIs('admin.assignments.*') || request()->routeIs('admin.submissions.*') ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' : 'text-slate-300 hover:bg-slate-800/70 hover:text-white' }}">
-                    <svg class="w-5 h-5 shrink-0 {{ request()->routeIs('admin.assignments.*') || request()->routeIs('admin.submissions.*') ? 'text-emerald-400' : 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path>
-                    </svg>
-                    <span :class="sidebarCollapsed ? 'lg:hidden' : 'block'" class="truncate">📝 Bài tập & Bài nộp</span>
-                </a>
+                
 
-                <!-- Questions Q&A -->
-                <a href="{{ route('admin.questions.index') }}" 
-                   :title="sidebarCollapsed ? 'Hỏi đáp học viên' : ''"
-                   :class="sidebarCollapsed ? 'lg:justify-center lg:px-2' : ''"
-                   class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 {{ request()->routeIs('admin.questions.*') ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30' : 'text-slate-300 hover:bg-slate-800/70 hover:text-white' }}">
-                    <svg class="w-5 h-5 shrink-0 {{ request()->routeIs('admin.questions.*') ? 'text-emerald-400' : 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z"></path>
-                    </svg>
-                    <span :class="sidebarCollapsed ? 'lg:hidden' : 'block'" class="truncate">💬 Hỏi đáp học viên</span>
-                </a>
-
-                <!-- Featured Showcase -->
-                <a href="{{ route('admin.featured.index') }}" 
-                   :title="sidebarCollapsed ? 'Tiêu biểu (Showcase)' : ''"
-                   :class="sidebarCollapsed ? 'lg:justify-center lg:px-2' : ''"
-                   class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 {{ request()->routeIs('admin.featured.*') ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30' : 'text-slate-300 hover:bg-slate-800/70 hover:text-white' }}">
-                    <svg class="w-5 h-5 shrink-0 {{ request()->routeIs('admin.featured.*') ? 'text-amber-400' : 'text-amber-500/80' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
-                    </svg>
-                    <span :class="sidebarCollapsed ? 'lg:hidden' : 'block'" class="truncate">⭐ Tiêu biểu (Showcase)</span>
-                </a>
-
+                
                 <div :class="sidebarCollapsed ? 'lg:hidden' : 'block'" class="pt-4 px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Giao dịch & Phân tích</div>
                 <div :class="sidebarCollapsed ? 'hidden lg:block' : 'hidden'" class="my-2 border-t border-slate-800 mx-1"></div>
 
@@ -198,8 +198,20 @@
                     <svg class="w-5 h-5 shrink-0 {{ request()->routeIs('admin.model-trades.*') ? 'text-emerald-400' : 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"></path>
                     </svg>
-                    <span :class="sidebarCollapsed ? 'lg:hidden' : 'block'" class="truncate">🏆 Mô hình mẫu</span>
+                    <span :class="sidebarCollapsed ? 'lg:hidden' : 'block'" class="truncate"> Mô hình mẫu</span>
                 </a>
+
+                <!-- Featured Showcase -->
+                <a href="{{ route('admin.featured.index') }}" 
+                   :title="sidebarCollapsed ? 'Tiêu biểu (Showcase)' : ''"
+                   :class="sidebarCollapsed ? 'lg:justify-center lg:px-2' : ''"
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 {{ request()->routeIs('admin.featured.*') ? 'bg-amber-500/10 text-amber-400 border border-amber-500/30' : 'text-slate-300 hover:bg-slate-800/70 hover:text-white' }}">
+                    <svg class="w-5 h-5 shrink-0 {{ request()->routeIs('admin.featured.*') ? 'text-amber-400' : 'text-amber-500/80' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+                    </svg>
+                    <span :class="sidebarCollapsed ? 'lg:hidden' : 'block'" class="truncate"> Tiêu biểu (Showcase)</span>
+                </a>
+
 
                 <!-- Trade Stats -->
                 <a href="{{ Route::has('admin.trade-stats.index') ? route('admin.trade-stats.index') : url('/admin/trade-stats') }}" 
@@ -209,7 +221,7 @@
                     <svg class="w-5 h-5 shrink-0 {{ request()->routeIs('admin.trade-stats.*') ? 'text-emerald-400' : 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8v8m-4-5v5m-4-2v2m-2 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                     </svg>
-                    <span :class="sidebarCollapsed ? 'lg:hidden' : 'block'" class="truncate">📊 Thống kê Trading</span>
+                    <span :class="sidebarCollapsed ? 'lg:hidden' : 'block'" class="truncate"> Thống kê Trading</span>
                 </a>
 
                 <!-- Notifications -->
@@ -220,7 +232,7 @@
                     <svg class="w-5 h-5 shrink-0 {{ request()->routeIs('admin.notifications.*') ? 'text-emerald-400' : 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
                     </svg>
-                    <span :class="sidebarCollapsed ? 'lg:hidden' : 'block'" class="truncate">🔔 Thông báo</span>
+                    <span :class="sidebarCollapsed ? 'lg:hidden' : 'block'" class="truncate"> Thông báo</span>
                 </a>
             </nav>
 

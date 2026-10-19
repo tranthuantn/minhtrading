@@ -18,10 +18,16 @@
     <header class="border-b border-slate-800/80 bg-slate-900/60 backdrop-blur sticky top-0 z-50">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
             <div class="flex items-center space-x-3">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-sky-500 flex items-center justify-center font-bold text-slate-950 shadow-lg shadow-emerald-500/20">
+                <!-- <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-emerald-500 to-sky-500 flex items-center justify-center font-bold text-slate-950 shadow-lg shadow-emerald-500/20">
                     MT
+                </div> -->
+                <!-- // cho image dạng circle vào đây -->
+                <div class="w-10 h-10 shrink-0 rounded-full bg-gradient-to-tr from-emerald-500 to-sky-500 flex items-center justify-center text-slate
+-950 font-black shadow-lg shadow-emerald-500/20 group-hover:scale-105 transition-transform">
+                    <img src="{{ asset('icon.jfif') }}" alt="MinhTrading" class="w-full h-full object-cover rounded-full">
                 </div>
-                <div>
+                
+                    <div>
                     <span class="text-xl font-bold bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">MinhTrading</span>
                     <span class="hidden sm:inline-block text-xs px-2 py-0.5 ml-2 bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 rounded-full font-medium">Forex Academy</span>
                 </div>
@@ -55,7 +61,7 @@
             <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative text-center">
                 <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-slate-700/80 text-xs text-slate-300 mb-6">
                     <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                    <span>Hệ thống đào tạo & kiểm soát lệnh chuẩn SMC / Price Action</span>
+                    <span>Hệ thống đào tạo TMS</span>
                 </div>
 
                 <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight max-w-4xl mx-auto leading-tight sm:leading-none">
@@ -185,47 +191,7 @@
             </div>
         </section>
 
-        <!-- Quick Demo Accounts -->
-        <section id="quick-login" class="py-14 bg-slate-900/40 border-t border-slate-800/80">
-            <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="text-center mb-8">
-                    <h3 class="text-2xl font-bold">Tài Khoản Thử Nghiệm Sẵn Có</h3>
-                    <p class="text-slate-400 text-sm mt-1">Dữ liệu mẫu đã được nạp sẵn để bạn trải nghiệm ngay lập tức</p>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <!-- Admin Login Box -->
-                    <div class="p-6 rounded-xl bg-slate-900 border border-emerald-500/30">
-                        <div class="flex items-center justify-between mb-3">
-                            <span class="text-sm font-bold text-emerald-400 uppercase tracking-wider">Tài khoản Quản Trị Viên (Admin)</span>
-                            <span class="text-xs px-2 py-0.5 bg-emerald-500/20 text-emerald-300 rounded">Full Access</span>
-                        </div>
-                        <div class="space-y-1 text-sm font-mono bg-slate-950 p-3 rounded-lg border border-slate-800">
-                            <div><span class="text-slate-400">Email:</span> <span class="text-emerald-300">admin@minhtrading.com</span></div>
-                            <div><span class="text-slate-400">Password:</span> <span class="text-slate-200">password</span></div>
-                        </div>
-                        <a href="{{ route('login') }}" class="mt-4 block w-full text-center py-2 px-4 rounded-lg bg-emerald-500/10 hover:bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-sm font-semibold transition">
-                            Đăng nhập với vai trò Giảng Viên &rarr;
-                        </a>
-                    </div>
-
-                    <!-- Student Login Box -->
-                    <div class="p-6 rounded-xl bg-slate-900 border border-sky-500/30">
-                        <div class="flex items-center justify-between mb-3">
-                            <span class="text-sm font-bold text-sky-400 uppercase tracking-wider">Tài khoản Học Viên (Student)</span>
-                            <span class="text-xs px-2 py-0.5 bg-sky-500/20 text-sky-300 rounded">Học viên tiêu biểu</span>
-                        </div>
-                        <div class="space-y-1 text-sm font-mono bg-slate-950 p-3 rounded-lg border border-slate-800">
-                            <div><span class="text-slate-400">Email:</span> <span class="text-sky-300">nguyenvanan@example.com</span></div>
-                            <div><span class="text-slate-400">Password:</span> <span class="text-slate-200">password</span></div>
-                        </div>
-                        <a href="{{ route('login') }}" class="mt-4 block w-full text-center py-2 px-4 rounded-lg bg-sky-500/10 hover:bg-sky-500/20 text-sky-400 border border-sky-500/30 text-sm font-semibold transition">
-                            Đăng nhập với vai trò Học Viên &rarr;
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </section>
+       
     </main>
 
     <!-- Footer -->
