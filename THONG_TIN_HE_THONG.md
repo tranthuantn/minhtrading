@@ -34,7 +34,7 @@ Tất cả tài khoản thử nghiệm bên dưới đều dùng chung mật kh�
 1. Đảm bảo Laragon đã bật **Apache/Nginx** và **MySQL**.
 2. Truy cập qua tên miền ảo nội bộ: [http://minhtrading.test](http://minhtrading.test)
 
-*(Tùy chọn: Chạy kiểm thử tự động với lệnh `php artisan test` - hiện có 65/65 test case đạt chuẩn với 235 assertions).*
+*(Tùy chọn: Chạy kiểm thử tự động với lệnh `php artisan test` - hiện có 74/74 test case đạt chuẩn với 287 assertions).*
 
 ---
 
@@ -91,8 +91,12 @@ Tất cả tài khoản thử nghiệm bên dưới đều dùng chung mật kh�
    - **Chia sẻ mở toàn hệ thống (Cross-course Sharing):** Bài nộp tiêu biểu sẽ được đưa vào thư viện Showcase chung để **toàn bộ học viên ở mọi khóa học (K15, K16, K17...) đều có thể tham khảo, nghiên cứu và học hỏi kinh nghiệm**, phá vỡ rào cản phân cách giữa các khóa.
 
 8. **Quản Lý & Giải Đáp Câu Hỏi Của Học Viên (`/admin/questions`):**
-   - Theo dõi toàn bộ các thắc mắc của học viên được đặt theo từng bài học cụ thể.
-   - **Bộ lọc thông minh:** Lọc theo Khóa học, Trạng thái giải đáp (`Chưa trả lời` / `Đã trả lời`), Trạng thái tiêu biểu, và Tìm kiếm theo từ khóa hoặc tên học viên.
+   - Theo dõi toàn bộ thắc mắc của học viên được đặt **trong từng bài học** hoặc **ngoài bài học (hỏi đáp chung)**.
+   - **Bộ lọc đa chiều thông minh:**
+     - **Lọc theo Khóa học / Ngoài bài học:** Cho phép lọc xem câu hỏi của từng khóa học cụ thể hoặc lọc riêng mục `🌐 Ngoài bài học (Hỏi đáp chung)`.
+     - **Lọc theo Trạng thái giải đáp:** `Tất cả` | `⏳ Chưa có câu trả lời` (`unanswered`) | `✅ Đã có câu trả lời` (`answered`).
+     - **Lọc Tiêu biểu:** Xem các câu hỏi đã được đánh giá tiêu biểu.
+     - **Tìm kiếm:** Tìm theo từ khóa trong tiêu đề, nội dung hoặc tên học viên.
    - **Soạn lời giải đáp chuyên nghiệp (`/admin/questions/{id}`):**
      - Giảng viên soạn nội dung giải đáp cặn kẽ cho học viên.
      - **Hỗ trợ tải lên hình ảnh biểu đồ minh họa:** Đính kèm ảnh chụp màn hình phân tích chuẩn (Chart sửa lỗi, xác nhận entry, chỉ ra FVG/OB chuẩn...).
@@ -137,16 +141,24 @@ Tất cả tài khoản thử nghiệm bên dưới đều dùng chung mật kh�
      - Xem các câu hỏi đã có của bài học, nhận biết câu hỏi tiêu biểu có badge `⭐ Tiêu biểu` và đọc câu trả lời giải đáp từ Giảng viên.
      - Trang thảo luận chi tiết (`/student/questions/{id}`) cho phép học viên và Giảng viên trao đổi, phản hồi nhiều lượt.
 
-3. **Gộp Quản Lý Bài Tập & Bài Đã Nộp (`/student/assignments`):**
-   - **Bài tập được Giảng viên thiết kế độc lập:** Mỗi bài tập được tạo tương ứng với nội dung kiến thức trọng tâm cần rèn luyện.
-   - **Danh sách bài tập chia theo từng khóa học:** Mỗi khóa học được hiển thị trong một khung riêng biệt, có tiêu đề khóa học, số lượng bài tập và thanh tiến độ hoàn thành trực quan.
-   - **Bộ lọc khóa học & Bộ lọc trạng thái đồng bộ:**
-     - **Lọc Khóa Học:** Cho phép chọn xem bài tập của một khóa học cụ thể hoặc tất cả các khóa học được cấp quyền.
-     - **Lọc Trạng Thái:** Lọc nhanh tức thời: `Tất cả` | `Chưa nộp` | `Chờ chấm` | `Đã chấm` | `Cần sửa lại`.
-   - **Bảng danh sách hợp nhất đa năng:**
-     - Xem trực quan Tên bài tập, Bài học tương ứng, Loại bài (Phân tích / Backtest / Vào lệnh), Hạn nộp (Deadline), Trạng thái nộp bài, Điểm số đạt được và Nhận xét của Giảng viên.
-     - Hành động thông minh theo trạng thái: Nếu chưa nộp -> nút **"Làm bài ngay"**; Nếu đã nộp -> nút **"Xem bài & nhận xét"**; Nếu cần sửa lại -> nút **"Sửa & Nộp lại"**.
-   - **Trang làm bài & xem kết quả tích hợp (`show.blade.php`):** Xem yêu cầu đề bài, nộp bài/sửa bài, và đọc toàn bộ nhận xét, điểm số, hướng dẫn khắc phục của Giảng viên trên cùng một trang.
+3. **Gộp Quản Lý Bài Tập & Hỏi Đáp (`/student/assignments` - Menu "📝 Bài tập & Hỏi đáp"):**
+   - **Tích hợp 2 Tab nghiệp vụ song hành:**
+     - **Tab 1 - 📝 Bài Tập & Bài Nộp:**
+       - Mỗi bài tập được tạo tương ứng với nội dung kiến thức trọng tâm cần rèn luyện.
+       - Danh sách bài tập chia theo từng khóa học được cấp quyền, có thanh tiến độ hoàn thành trực quan.
+       - Bộ lọc nhanh theo Khóa học và Trạng thái nộp: `Tất cả` | `Chưa nộp` | `Chờ chấm` | `Đã chấm` | `Cần sửa lại`.
+       - Hành động thông minh theo trạng thái: Nếu chưa nộp -> nút **"Làm bài ngay"**; Nếu đã nộp -> nút **"Xem bài & nhận xét"**; Nếu cần sửa lại -> nút **"Sửa & Nộp lại"**.
+     - **Tab 2 - 💬 Hỏi Đáp & Thảo Luận:**
+       - **Đặt câu hỏi linh hoạt qua Popup Modal:**
+         - **Trong bài học cụ thể:** Học viên chọn Khóa học -> Chọn Bài học cụ thể để đặt câu hỏi.
+         - **Ngoài bài học (Hỏi đáp chung):** Học viên đặt các câu hỏi mở về tâm lý, quản lý vốn, setup thực tế, chọn sàn... có thể gắn với một khóa học cụ thể hoặc để hỏi chung toàn hệ thống.
+         - Đính kèm tối đa 5 hình ảnh biểu đồ phân tích (JPG, PNG, WebP).
+       - **Bộ lọc tìm kiếm toàn diện:**
+         - **Lọc theo Khóa học / Ngoài bài học:** `Tất cả phạm vi` | `🌐 Ngoài bài học (Hỏi chung)` | Từng khóa học được cấp quyền.
+         - **Lọc theo Trạng thái:** `Tất cả` | `⏳ Chưa có câu trả lời` | `✅ Đã có câu trả lời`.
+         - **Lọc câu hỏi cá nhân:** Tùy chọn checkbox `"Chỉ câu hỏi của tôi"`.
+         - **Tìm kiếm từ khóa:** Tìm nhanh theo tiêu đề và nội dung thắc mắc.
+       - Thẻ hiển thị trực quan thông tin người hỏi, badge phạm vi bài học, badge trạng thái đã/chưa giải đáp, số lượt phản hồi, ảnh thumbnail và link vào trang thảo luận chi tiết `/student/questions/{id}`.
 
 4. **Thư Viện Bài Tập & Câu Hỏi Tiêu Biểu - Showcase Mở Rộng (`/student/featured`):**
    - **Chia sẻ mở toàn diện:** Học viên có thể xem **tất cả bài tập tiêu biểu và câu hỏi tiêu biểu của tất cả các khóa học** trong học viện để học hỏi kinh nghiệm, phương pháp phân tích biểu đồ và cách xử lý tình huống thực chiến xuất sắc từ các bạn học khác.

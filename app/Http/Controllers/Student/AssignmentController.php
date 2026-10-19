@@ -4,6 +4,8 @@ namespace App\Http\Controllers\Student;
 
 use App\Http\Controllers\Controller;
 use App\Models\Assignment;
+use App\Models\Course;
+use App\Models\LessonQuestion;
 use App\Models\Submission;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -122,13 +124,97 @@ class AssignmentController extends Controller
             'revision_needed' => $revisionCount,
         ];
 
+        // Active tab: 'assignments' or 'questions'
+        $activeTab = $request->input('tab', 'assignments');
+
+        // Questions query for student
+        $questionsBaseQuery = LessonQuestion::with(['course', 'lesson.course', 'user', 'answers.user'])
+            ->withCount('answers')
+            ->where(function ($q) use ($userId, $enrolledCourseIds) {
+                $q->where('is_featured', true)
+                    ->orWhere('user_id', $userId)
+                    ->orWhere(function ($oq) {
+                        $oq->whereNull('lesson_id')->whereNull('course_id');
+                    })
+                    ->orWhereIn('course_id', $enrolledCourseIds)
+                    ->orWhereHas('lesson', function ($lq) use ($enrolledCourseIds) {
+                        $lq->whereIn('course_id', $enrolledCourseIds);
+                    });
+            });
+
+        // Filter by course or outside lesson
+        if ($request->filled('q_course')) {
+            $qCourse = $request->input('q_course');
+            if ($qCourse === 'outside') {
+                $questionsBaseQuery->whereNull('lesson_id');
+            } elseif (in_array((int) $qCourse, $enrolledCourseIds)) {
+                $cid = (int) $qCourse;
+                $questionsBaseQuery->where(function ($q) use ($cid) {
+                    $q->where('course_id', $cid)
+                        ->orWhereHas('lesson', fn ($lq) => $lq->where('course_id', $cid));
+                });
+            }
+        }
+
+        // Filter by question status: 'unanswered', 'answered'
+        if ($request->filled('q_status')) {
+            $qStatus = $request->input('q_status');
+            if ($qStatus === 'unanswered') {
+                $questionsBaseQuery->doesntHave('answers');
+            } elseif ($qStatus === 'answered') {
+                $questionsBaseQuery->has('answers');
+            }
+        }
+
+        // Filter by only my questions
+        if ($request->boolean('only_mine')) {
+            $questionsBaseQuery->where('user_id', $userId);
+        }
+
+        // Search questions
+        if ($request->filled('q_search')) {
+            $qSearch = trim($request->input('q_search'));
+            $questionsBaseQuery->where(function ($q) use ($qSearch) {
+                $q->where('title', 'like', "%{$qSearch}%")
+                    ->orWhere('content', 'like', "%{$qSearch}%");
+            });
+        }
+
+        $questions = $questionsBaseQuery->latest()->paginate(10, ['*'], 'q_page')->withQueryString();
+
+        // Calculate stats for questions
+        $questionsPermittedScope = function ($q) use ($userId, $enrolledCourseIds) {
+            $q->where('is_featured', true)
+                ->orWhere('user_id', $userId)
+                ->orWhere(function ($oq) {
+                    $oq->whereNull('lesson_id')->whereNull('course_id');
+                })
+                ->orWhereIn('course_id', $enrolledCourseIds)
+                ->orWhereHas('lesson', fn ($lq) => $lq->whereIn('course_id', $enrolledCourseIds));
+        };
+
+        $questionsStats = [
+            'total' => LessonQuestion::where($questionsPermittedScope)->count(),
+            'unanswered' => LessonQuestion::where($questionsPermittedScope)->doesntHave('answers')->count(),
+            'answered' => LessonQuestion::where($questionsPermittedScope)->has('answers')->count(),
+            'outside' => LessonQuestion::where($questionsPermittedScope)->whereNull('lesson_id')->count(),
+            'my_questions' => LessonQuestion::where('user_id', $userId)->count(),
+        ];
+
+        // Eager load lessons on enrolled courses for modal select
+        $enrolledCoursesWithLessons = $enrolledCourses->load('lessons');
+
         return view('student.assignments.index', compact(
             'assignments',
             'assignmentsByCourse',
             'enrolledCourses',
+            'enrolledCoursesWithLessons',
             'selectedCourseId',
             'courseStats',
-            'stats'
+            'stats',
+            'activeTab',
+            'questions',
+            'questionsStats'
         ));
     }
 

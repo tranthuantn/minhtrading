@@ -72,14 +72,17 @@
 
             <!-- Course Filter -->
             <div>
-                <label class="block text-[11px] font-semibold text-slate-400 mb-1">Khóa học</label>
+                <label class="block text-[11px] font-semibold text-slate-400 mb-1">Khóa học / Phạm vi</label>
                 <select name="course_id" class="w-full px-3 py-2 rounded-lg bg-slate-900 border border-slate-700 text-xs text-white focus:outline-none focus:border-emerald-500">
-                    <option value="">Tất cả khóa học</option>
-                    @foreach($courses as $c)
-                        <option value="{{ $c->id }}" {{ request('course_id') == $c->id ? 'selected' : '' }}>
-                            {{ Str::limit($c->title, 25) }}
-                        </option>
-                    @endforeach
+                    <option value="">Tất cả câu hỏi</option>
+                    <option value="outside" {{ request('course_id') === 'outside' ? 'selected' : '' }}>🌐 Ngoài bài học (Hỏi đáp chung)</option>
+                    <optgroup label="Theo khóa học">
+                        @foreach($courses as $c)
+                            <option value="{{ $c->id }}" {{ request('course_id') == $c->id ? 'selected' : '' }}>
+                                {{ Str::limit($c->title, 25) }}
+                            </option>
+                        @endforeach
+                    </optgroup>
                 </select>
             </div>
 
@@ -136,8 +139,20 @@
                             </td>
 
                             <td class="px-4 py-3.5">
-                                <span class="font-semibold text-slate-200 block">{{ $question->lesson->title ?? 'Bài học' }}</span>
-                                <span class="text-[11px] text-slate-400 block">{{ $question->lesson->course->title ?? 'Khóa học' }}</span>
+                                @if($question->lesson)
+                                    <span class="font-semibold text-slate-200 block">{{ $question->lesson->title }}</span>
+                                    <span class="text-[11px] text-slate-400 block">{{ $question->lesson->course->title ?? 'Khóa học' }}</span>
+                                @elseif($question->course)
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-sky-500/15 text-sky-400 border border-sky-500/30">
+                                        🌐 Ngoài bài học
+                                    </span>
+                                    <span class="text-[11px] text-slate-400 block mt-0.5">{{ $question->course->title }}</span>
+                                @else
+                                    <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-700 text-slate-300 border border-slate-600">
+                                        🌐 Ngoài bài học
+                                    </span>
+                                    <span class="text-[10px] text-slate-500 block mt-0.5">Hỏi đáp chung</span>
+                                @endif
                             </td>
 
                             <td class="px-4 py-3.5 max-w-xs">

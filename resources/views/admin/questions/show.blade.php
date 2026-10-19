@@ -19,7 +19,13 @@
                 @endif
             </h1>
             <p class="text-sm text-slate-400 mt-1">
-                Khóa học: <span class="text-white font-medium">{{ $question->lesson->course->title ?? 'Khóa học' }}</span> • Bài học: <span class="text-sky-400 font-semibold">{{ $question->lesson->title }}</span>
+                @if($question->lesson)
+                    Khóa học: <span class="text-white font-medium">{{ $question->lesson->course->title ?? 'Khóa học' }}</span> • Bài học: <span class="text-sky-400 font-semibold">{{ $question->lesson->title }}</span>
+                @elseif($question->course)
+                    Khóa học: <span class="text-white font-medium">{{ $question->course->title }}</span> • <span class="px-2 py-0.5 rounded bg-sky-500/20 text-sky-400 border border-sky-500/30 text-xs font-semibold">🌐 Ngoài bài học</span>
+                @else
+                    <span class="px-2 py-0.5 rounded bg-slate-700 text-slate-300 border border-slate-600 text-xs font-semibold">🌐 Ngoài bài học (Hỏi đáp chung)</span>
+                @endif
             </p>
         </div>
 

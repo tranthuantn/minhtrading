@@ -342,5 +342,104 @@ class FeaturedAndQuestionSystemTest extends TestCase
         $responseAdmin->assertStatus(200);
         $responseAdmin->assertSee('Bài tập tiêu biểu độc nhất');
     }
+
+    public function test_student_can_create_question_in_and_outside_lesson_and_filter(): void
+    {
+        // 1. Student creates question IN lesson
+        $responseInLesson = $this->actingAs($this->student1)->post(route('student.questions.store'), [
+            'scope' => 'lesson',
+            'lesson_id' => $this->lesson1->id,
+            'title' => 'Thắc mắc về Sóng Elliott trong bài 1',
+            'content' => 'Làm sao phân biệt sóng 3 mở rộng với sóng 5?',
+        ]);
+        $responseInLesson->assertRedirect(route('student.assignments.index', ['tab' => 'questions']));
+        $this->assertDatabaseHas('lesson_questions', [
+            'user_id' => $this->student1->id,
+            'lesson_id' => $this->lesson1->id,
+            'course_id' => $this->course1->id,
+            'title' => 'Thắc mắc về Sóng Elliott trong bài 1',
+        ]);
+
+        // 2. Student creates question OUTSIDE lesson (attached to course)
+        $responseOutsideCourse = $this->actingAs($this->student1)->post(route('student.questions.store'), [
+            'scope' => 'outside',
+            'course_id' => $this->course1->id,
+            'title' => 'Tâm lý giao dịch khi đu đỉnh',
+            'content' => 'Cách quản lý tâm lý khi vào lệnh ngược xu hướng?',
+        ]);
+        $responseOutsideCourse->assertRedirect(route('student.assignments.index', ['tab' => 'questions']));
+        $this->assertDatabaseHas('lesson_questions', [
+            'user_id' => $this->student1->id,
+            'lesson_id' => null,
+            'course_id' => $this->course1->id,
+            'title' => 'Tâm lý giao dịch khi đu đỉnh',
+        ]);
+
+        // 3. Student creates question OUTSIDE lesson (general, no course)
+        $responseGeneral = $this->actingAs($this->student1)->post(route('student.questions.store'), [
+            'scope' => 'outside',
+            'course_id' => null,
+            'title' => 'Hỏi về chọn sàn giao dịch Forex',
+            'content' => 'Nên dùng sàn IC Markets hay Exness?',
+        ]);
+        $responseGeneral->assertRedirect(route('student.assignments.index', ['tab' => 'questions']));
+        $this->assertDatabaseHas('lesson_questions', [
+            'user_id' => $this->student1->id,
+            'lesson_id' => null,
+            'course_id' => null,
+            'title' => 'Hỏi về chọn sàn giao dịch Forex',
+        ]);
+
+        $outsideQuestion = LessonQuestion::where('title', 'Tâm lý giao dịch khi đu đỉnh')->first();
+
+        // Admin answers the outside question
+        $this->actingAs($this->admin)->post(route('admin.questions.answer', $outsideQuestion->id), [
+            'content' => 'Nên dừng giao dịch và xem lại nhật ký vào lệnh.',
+        ]);
+
+        // 4. Test Student Q&A Tab filtering
+        // Filter by outside lesson
+        $resOutside = $this->actingAs($this->student1)->get(route('student.assignments.index', [
+            'tab' => 'questions',
+            'q_course' => 'outside',
+        ]));
+        $resOutside->assertStatus(200);
+        $resOutside->assertSee('Tâm lý giao dịch khi đu đỉnh');
+        $resOutside->assertSee('Hỏi về chọn sàn giao dịch Forex');
+        $resOutside->assertDontSee('Thắc mắc về Sóng Elliott trong bài 1');
+
+        // Filter by answered status
+        $resAnswered = $this->actingAs($this->student1)->get(route('student.assignments.index', [
+            'tab' => 'questions',
+            'q_status' => 'answered',
+        ]));
+        $resAnswered->assertStatus(200);
+        $resAnswered->assertSee('Tâm lý giao dịch khi đu đỉnh');
+        $resAnswered->assertDontSee('Thắc mắc về Sóng Elliott trong bài 1');
+
+        // Filter by unanswered status
+        $resUnanswered = $this->actingAs($this->student1)->get(route('student.assignments.index', [
+            'tab' => 'questions',
+            'q_status' => 'unanswered',
+        ]));
+        $resUnanswered->assertStatus(200);
+        $resUnanswered->assertSee('Thắc mắc về Sóng Elliott trong bài 1');
+        $resUnanswered->assertDontSee('Tâm lý giao dịch khi đu đỉnh');
+
+        // 5. Test Admin Questions Index filtering
+        $resAdminOutside = $this->actingAs($this->admin)->get(route('admin.questions.index', [
+            'course_id' => 'outside',
+        ]));
+        $resAdminOutside->assertStatus(200);
+        $resAdminOutside->assertSee('Tâm lý giao dịch khi đu đỉnh');
+        $resAdminOutside->assertDontSee('Thắc mắc về Sóng Elliott trong bài 1');
+
+        $resAdminAnswered = $this->actingAs($this->admin)->get(route('admin.questions.index', [
+            'status' => 'answered',
+        ]));
+        $resAdminAnswered->assertStatus(200);
+        $resAdminAnswered->assertSee('Tâm lý giao dịch khi đu đỉnh');
+        $resAdminAnswered->assertDontSee('Thắc mắc về Sóng Elliott trong bài 1');
+    }
 }
 

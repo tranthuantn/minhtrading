@@ -133,15 +133,15 @@
                 <div :class="sidebarCollapsed ? 'lg:hidden' : 'block'" class="pt-4 px-3 pb-2 text-[11px] font-semibold uppercase tracking-wider text-slate-500">Bài tập & Hỏi đáp</div>
                 <div :class="sidebarCollapsed ? 'hidden lg:block' : 'hidden'" class="my-2 border-t border-slate-800 mx-1"></div>
 
-                <!-- Assignments & Submissions -->
+                <!-- Assignments & Questions -->
                 <a href="{{ Route::has('student.assignments.index') ? route('student.assignments.index') : url('/student/assignments') }}" 
-                   :title="sidebarCollapsed ? 'Bài tập & Bài nộp' : ''"
+                   :title="sidebarCollapsed ? 'Bài tập & Hỏi đáp' : ''"
                    :class="sidebarCollapsed ? 'lg:justify-center lg:px-2' : ''"
-                   class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 {{ request()->routeIs('student.assignments.*') || request()->routeIs('student.submissions.*') ? 'bg-sky-500/10 text-sky-400 border border-sky-500/30' : 'text-slate-300 hover:bg-slate-800/70 hover:text-white' }}">
-                    <svg class="w-5 h-5 shrink-0 {{ request()->routeIs('student.assignments.*') || request()->routeIs('student.submissions.*') ? 'text-sky-400' : 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 {{ request()->routeIs('student.assignments.*') || request()->routeIs('student.submissions.*') || request()->routeIs('student.questions.*') ? 'bg-sky-500/10 text-sky-400 border border-sky-500/30' : 'text-slate-300 hover:bg-slate-800/70 hover:text-white' }}">
+                    <svg class="w-5 h-5 shrink-0 {{ request()->routeIs('student.assignments.*') || request()->routeIs('student.submissions.*') || request()->routeIs('student.questions.*') ? 'text-sky-400' : 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
                     </svg>
-                    <span :class="sidebarCollapsed ? 'lg:hidden' : 'block'" class="truncate"> Bài tập & Bài nộp</span>
+                    <span :class="sidebarCollapsed ? 'lg:hidden' : 'block'" class="truncate">📝 Bài tập & Hỏi đáp</span>
                 </a>
 
 

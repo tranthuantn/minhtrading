@@ -19,14 +19,22 @@ class QuestionController extends Controller
      */
     public function index(Request $request): View
     {
-        $query = LessonQuestion::with(['lesson.course', 'user', 'answers.user'])
+        $query = LessonQuestion::with(['course', 'lesson.course', 'user', 'answers.user'])
             ->withCount('answers');
 
-        // Filter by course
+        // Filter by course or outside lesson
         if ($request->filled('course_id')) {
-            $query->whereHas('lesson', function ($q) use ($request) {
-                $q->where('course_id', $request->input('course_id'));
-            });
+            $courseFilter = $request->input('course_id');
+            if ($courseFilter === 'outside') {
+                $query->whereNull('lesson_id');
+            } else {
+                $query->where(function ($q) use ($courseFilter) {
+                    $q->where('course_id', $courseFilter)
+                        ->orWhereHas('lesson', function ($lq) use ($courseFilter) {
+                            $lq->where('course_id', $courseFilter);
+                        });
+                });
+            }
         }
 
         // Filter by featured status
@@ -62,6 +70,8 @@ class QuestionController extends Controller
         $stats = [
             'total' => LessonQuestion::count(),
             'unanswered' => LessonQuestion::doesntHave('answers')->count(),
+            'answered' => LessonQuestion::has('answers')->count(),
+            'outside' => LessonQuestion::whereNull('lesson_id')->count(),
             'featured' => LessonQuestion::featured()->count(),
         ];
 
@@ -73,7 +83,7 @@ class QuestionController extends Controller
      */
     public function show(LessonQuestion $question): View
     {
-        $question->load(['lesson.course', 'user', 'answers.user']);
+        $question->load(['lesson.course', 'course', 'user', 'answers.user']);
 
         return view('admin.questions.show', compact('question'));
     }
@@ -124,15 +134,20 @@ class QuestionController extends Controller
         }
 
         // Send notification to the student
-        $featuredExtra = $question->is_featured ? ' Đặc biệt, câu hỏi của bạn đã được Giảng viên đánh giá là CÂU HỎI TIÊU BIỂU của khóa học!' : '';
+        $featuredExtra = $question->is_featured ? ' Đặc biệt, câu hỏi của bạn đã được Giảng viên đánh giá là CÂU HỎI TIÊU BIỂU!' : '';
+        $contextText = $question->lesson 
+            ? 'tại bài học "' . $question->lesson->title . '"'
+            : ($question->course ? 'thuộc khóa "' . $question->course->title . '"' : '(câu hỏi ngoài bài học)');
+
         UserNotification::create([
             'user_id' => $question->user_id,
             'title' => 'Giảng viên đã giải đáp câu hỏi của bạn!',
-            'message' => 'Giảng viên đã phản hồi câu hỏi tại bài học "' . ($question->lesson->title ?? 'Bài học') . '".' . $featuredExtra,
+            'message' => 'Giảng viên đã phản hồi câu hỏi của bạn ' . $contextText . '.' . $featuredExtra,
             'type' => 'info',
             'data' => [
                 'question_id' => $question->id,
                 'lesson_id' => $question->lesson_id,
+                'course_id' => $question->course_id,
             ],
             'is_read' => false,
         ]);

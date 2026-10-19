@@ -95,6 +95,7 @@ Route::middleware(['auth', 'student'])->prefix('student')->name('student.')->gro
     Route::get('courses/{course}/lessons/{lesson}', [Student\CourseController::class, 'lesson'])->name('courses.lesson');
 
     // Questions & Discussions
+    Route::post('questions', [Student\QuestionController::class, 'storeGeneral'])->name('questions.store');
     Route::post('lessons/{lesson}/questions', [Student\QuestionController::class, 'store'])->name('lessons.questions.store');
     Route::get('questions/{question}', [Student\QuestionController::class, 'show'])->name('questions.show');
     Route::post('questions/{question}/reply', [Student\QuestionController::class, 'reply'])->name('questions.reply');

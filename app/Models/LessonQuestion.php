@@ -18,6 +18,7 @@ class LessonQuestion extends Model
      */
     protected $fillable = [
         'user_id',
+        'course_id',
         'lesson_id',
         'title',
         'content',
@@ -50,11 +51,27 @@ class LessonQuestion extends Model
     }
 
     /**
-     * The lesson this question belongs to.
+     * The course this question is associated with (if any).
+     */
+    public function course(): BelongsTo
+    {
+        return $this->belongsTo(Course::class);
+    }
+
+    /**
+     * The lesson this question belongs to (null if outside lesson).
      */
     public function lesson(): BelongsTo
     {
         return $this->belongsTo(Lesson::class);
+    }
+
+    /**
+     * Check if question is outside of any lesson.
+     */
+    public function isOutsideLesson(): bool
+    {
+        return is_null($this->lesson_id);
     }
 
     /**

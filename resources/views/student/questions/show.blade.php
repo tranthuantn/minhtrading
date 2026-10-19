@@ -5,19 +5,32 @@
     <!-- Breadcrumbs -->
     <div class="flex items-center justify-between pb-4 border-b border-slate-800">
         <div class="flex items-center gap-2 text-xs text-slate-400">
-            <a href="{{ route('student.courses.index') }}" class="hover:text-white">Khóa học</a>
-            <span>/</span>
-            <a href="{{ route('student.courses.show', $question->lesson->course_id) }}" class="hover:text-white">{{ $question->lesson->course->title ?? 'Khóa học' }}</a>
-            <span>/</span>
-            <a href="{{ route('student.courses.lesson', ['course' => $question->lesson->course_id, 'lesson' => $question->lesson_id]) }}" class="hover:text-white">{{ $question->lesson->title }}</a>
-            <span>/</span>
-            <span class="text-sky-400">Hỏi đáp #{{ $question->id }}</span>
+            @if($question->lesson)
+                <a href="{{ route('student.courses.index') }}" class="hover:text-white">Khóa học</a>
+                <span>/</span>
+                <a href="{{ route('student.courses.show', $question->lesson->course_id) }}" class="hover:text-white">{{ $question->lesson->course->title ?? 'Khóa học' }}</a>
+                <span>/</span>
+                <a href="{{ route('student.courses.lesson', ['course' => $question->lesson->course_id, 'lesson' => $question->lesson_id]) }}" class="hover:text-white">{{ $question->lesson->title }}</a>
+                <span>/</span>
+                <span class="text-sky-400">Hỏi đáp #{{ $question->id }}</span>
+            @else
+                <a href="{{ route('student.assignments.index', ['tab' => 'questions']) }}" class="hover:text-white">Bài tập & Hỏi đáp</a>
+                <span>/</span>
+                <span class="text-sky-400">Hỏi đáp ngoài bài học #{{ $question->id }}</span>
+            @endif
         </div>
 
-        <a href="{{ route('student.courses.lesson', ['course' => $question->lesson->course_id, 'lesson' => $question->lesson_id]) }}" 
-           class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition">
-            &larr; Quay lại bài học
-        </a>
+        @if($question->lesson)
+            <a href="{{ route('student.courses.lesson', ['course' => $question->lesson->course_id, 'lesson' => $question->lesson_id]) }}" 
+               class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition">
+                &larr; Quay lại bài học
+            </a>
+        @else
+            <a href="{{ route('student.assignments.index', ['tab' => 'questions']) }}" 
+               class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition">
+                &larr; Quay lại danh sách hỏi đáp
+            </a>
+        @endif
     </div>
 
     <!-- Main Question Box -->
@@ -30,6 +43,21 @@
                 <div>
                     <h3 class="text-sm font-bold text-white">{{ $question->user->name ?? 'Học viên' }}</h3>
                     <p class="text-xs text-slate-400">Đăng lúc: {{ $question->created_at->format('H:i d/m/Y') }} ({{ $question->created_at->diffForHumans() }})</p>
+                    <div class="mt-1">
+                        @if($question->lesson)
+                            <span class="inline-flex items-center gap-1 text-[11px] text-slate-400">
+                                📖 Bài: <strong class="text-slate-300">{{ $question->lesson->title }}</strong> • Khóa: {{ $question->lesson->course->title ?? '' }}
+                            </span>
+                        @elseif($question->course)
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-sky-500/15 text-sky-400 border border-sky-500/30">
+                                🌐 Ngoài bài học (Khóa: {{ $question->course->title }})
+                            </span>
+                        @else
+                            <span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-700 text-slate-300 border border-slate-600">
+                                🌐 Ngoài bài học (Hỏi đáp chung)
+                            </span>
+                        @endif
+                    </div>
                 </div>
             </div>
 
