@@ -81,6 +81,14 @@ Route::middleware(['auth', 'admin'])->prefix('admin')->name('admin.')->group(fun
     Route::get('trade-stats', [Admin\TradeStatController::class, 'index'])->name('trade-stats.index');
     Route::get('trade-stats/{student}', [Admin\TradeStatController::class, 'studentStats'])->name('trade-stats.student');
 
+    // Tuition & Payments Management
+    Route::get('tuition', [Admin\TuitionController::class, 'index'])->name('tuition.index');
+    Route::get('tuition/create', [Admin\TuitionController::class, 'create'])->name('tuition.create');
+    Route::post('tuition', [Admin\TuitionController::class, 'store'])->name('tuition.store');
+    Route::get('tuition/history', [Admin\TuitionController::class, 'history'])->name('tuition.history');
+    Route::get('tuition/students/{student}', [Admin\TuitionController::class, 'studentHistory'])->name('tuition.student');
+    Route::post('tuition/students/{student}/remind', [Admin\TuitionController::class, 'remind'])->name('tuition.remind');
+
     // Notifications
     Route::resource('notifications', Admin\NotificationController::class)->only(['index', 'create', 'store', 'destroy']);
 });
@@ -93,6 +101,9 @@ Route::middleware(['auth', 'student'])->prefix('student')->name('student.')->gro
     Route::get('courses', [Student\CourseController::class, 'index'])->name('courses.index');
     Route::get('courses/{course}', [Student\CourseController::class, 'show'])->name('courses.show');
     Route::get('courses/{course}/lessons/{lesson}', [Student\CourseController::class, 'lesson'])->name('courses.lesson');
+
+    // Tuition & Receipts
+    Route::get('tuition', [Student\TuitionController::class, 'index'])->name('tuition.index');
 
     // Questions & Discussions
     Route::post('questions', [Student\QuestionController::class, 'storeGeneral'])->name('questions.store');

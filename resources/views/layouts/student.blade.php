@@ -161,6 +161,17 @@
                     <span :class="sidebarCollapsed ? 'lg:hidden' : 'block'" class="truncate"> Khóa học</span>
                 </a>
 
+                <!-- Tuition & Receipts -->
+                <a href="{{ route('student.tuition.index') }}" 
+                   :title="sidebarCollapsed ? 'Học phí & Biên lai' : ''"
+                   :class="sidebarCollapsed ? 'lg:justify-center lg:px-2' : ''"
+                   class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200 {{ request()->routeIs('student.tuition.*') ? 'bg-sky-500/10 text-sky-400 border border-sky-500/30' : 'text-slate-300 hover:bg-slate-800/70 hover:text-white' }}">
+                    <svg class="w-5 h-5 shrink-0 {{ request()->routeIs('student.tuition.*') ? 'text-sky-400' : 'text-slate-400' }}" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
+                    </svg>
+                    <span :class="sidebarCollapsed ? 'lg:hidden' : 'block'" class="truncate"> Học phí & Biên lai</span>
+                </a>
+
                 
 
                 <!-- Model Trades -->

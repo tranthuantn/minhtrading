@@ -36,6 +36,38 @@
         </div>
     </div>
 
+    <!-- Tuition Alert Banner if overdue or due soon -->
+    @if(($overdueTuitionCount ?? 0) > 0 || ($dueSoonTuitionCount ?? 0) > 0)
+        <div class="p-4 rounded-xl bg-gradient-to-r from-slate-850 via-slate-800 to-slate-850 border border-slate-700 shadow-lg flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+                <span class="p-2.5 rounded-xl bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                </span>
+                <div>
+                    <h4 class="text-sm font-bold text-white flex items-center gap-2">
+                        <span>Cảnh báo học phí cần lưu ý:</span>
+                        @if(($overdueTuitionCount ?? 0) > 0)
+                            <span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-rose-500/20 text-rose-300 border border-rose-500/40">
+                                🔴 {{ $overdueTuitionCount }} học viên chưa nộp tiền
+                            </span>
+                        @endif
+                        @if(($dueSoonTuitionCount ?? 0) > 0)
+                            <span class="px-2 py-0.5 rounded-full text-xs font-semibold bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                                🟡 {{ $dueSoonTuitionCount }} học viên sắp hết hạn (≤ 5 ngày)
+                            </span>
+                        @endif
+                    </h4>
+                    <p class="text-xs text-slate-400 mt-0.5">Kiểm tra kỳ hạn, gửi thông báo nhắc học phí 1-Click hoặc ghi nhận thu tiền cho học viên.</p>
+                </div>
+            </div>
+            <a href="{{ route('admin.tuition.index') }}" 
+               class="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-700 hover:bg-slate-600 text-white transition flex items-center gap-1.5 whitespace-nowrap self-start sm:self-auto">
+                <span>Quản lý học phí ngay</span>
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            </a>
+        </div>
+    @endif
+
     <!-- Stat Cards Grid -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
         <x-stat-card 

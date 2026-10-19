@@ -34,7 +34,7 @@ Tất cả tài khoản thử nghiệm bên dưới đều dùng chung mật kh�
 1. Đảm bảo Laragon đã bật **Apache/Nginx** và **MySQL**.
 2. Truy cập qua tên miền ảo nội bộ: [http://minhtrading.test](http://minhtrading.test)
 
-*(Tùy chọn: Chạy kiểm thử tự động với lệnh `php artisan test` - hiện có 74/74 test case đạt chuẩn với 287 assertions).*
+*(Tùy chọn: Chạy kiểm thử tự động với lệnh `php artisan test` - hiện có 80/80 test case đạt chuẩn với 323 assertions).*
 
 ---
 
@@ -109,14 +109,30 @@ Tất cả tài khoản thử nghiệm bên dưới đều dùng chung mật kh�
      - **Tab 2 - ❓ Câu hỏi tiêu biểu:** Hiển thị câu hỏi của học viên, ảnh đính kèm, lời giải đáp chuẩn của Giảng viên, ghi chú lý do tiêu biểu.
    - Bộ lọc theo từng khóa học cụ thể.
 
-10. **Báo Cáo & Thống Kê Toàn Lớp (Trade Analytics):**
+10. **Quản Lý Học Phí & Cảnh Báo Nợ Thông Minh (`/admin/tuition`):**
+    - **Mô hình quản lý linh hoạt đa kỳ hạn:**
+      - Đóng theo từng tháng (`monthly`), đóng trước nhiều tháng (`multi_month` - 3 tháng theo quý, 6 tháng...), đóng trọn gói cả khóa (`full_course` - học trọn đời, miễn phí duy trì), hoặc miễn phí học bổng (`free`).
+    - **Thuật toán tự động phát hiện & cảnh báo nợ:**
+      - Hệ thống tự động so sánh ngày hiện tại với mốc `paid_until` của học viên để phân loại tức thời:
+        - 🟢 **Đã đóng đủ:** Còn hạn > 5 ngày.
+        - 🟡 **Sắp hết hạn:** Còn $\le$ 5 ngày nữa là đến hạn đóng tiếp theo.
+        - 🔴 **Chưa nộp tháng này:** Quá hạn từ 1 đến 30 ngày (ghi rõ quá hạn bao nhiêu ngày).
+        - ⛔ **Nợ nhiều tháng:** Quá hạn > 30 ngày (tính rõ nợ 2 tháng, 3 tháng...).
+        - 💎 **Trọn gói cả khóa:** Không bao giờ báo nợ.
+    - **Giao diện nhập liệu thông minh 1-Click (Chống nhầm lẫn 100%):**
+      - Khi chọn Học viên, hệ thống lập tức hiển thị **Thẻ tóm tắt học phí hiện tại** (hạn nộp cũ, số tiền/tháng, tình trạng nợ).
+      - **Các nút Preset tự động:** Bấm `[+ 1 Tháng]`, `[+ 3 Tháng (Quý)]`, `[+ 6 Tháng]`, `[Trọn gói]` $\rightarrow$ Hệ thống tự động cộng dồn từ ngày hết hạn cũ, tự nhảy ngày kết thúc (End Date) chính xác, tự nhân số tiền và tự điền nội dung ghi chú. Admin không phải tự tính nhẩm ngày kết thúc!
+      - Đính kèm ảnh chụp bill chuyển khoản, mã giao dịch ngân hàng và tự động gửi **Thông báo biên lai** xác nhận vào tài khoản học viên.
+    - **Hành động nhanh & Nhắc phí:** Nút **"Nhắc phí 1-Click"** gửi thông báo kèm hướng dẫn chuyển khoản trực tiếp tới app của học viên; xem sổ cái lịch sử giao dịch toàn viện hoặc chi tiết từng học viên.
+
+11. **Báo Cáo & Thống Kê Toàn Lớp (Trade Analytics):**
     - Tổng hợp toàn bộ dữ liệu giao dịch của học viên trong lớp.
     - Thống kê tỷ lệ Win/Loss, các cặp tiền được giao dịch hiệu quả nhất, phân tích tâm lý và kỷ luật lệnh.
 
-11. **Gửi Thông Báo (Notifications):**
+12. **Gửi Thông Báo (Notifications):**
     - Gửi thông báo đến toàn thể lớp học hoặc đích danh một học viên cụ thể (thông báo lịch học, nhắc hạn nộp bài tập, chia sẻ góc nhìn thị trường).
 
-12. **Thanh Menu Điều Hướng Thông Minh (Collapsible Sidebar):**
+13. **Thanh Menu Điều Hướng Thông Minh (Collapsible Sidebar):**
     - Trang bị nút thu gọn / mở rộng menu (`«` / `»`) linh hoạt trên thanh Top Navbar và đầu thanh Sidebar.
     - Chế độ thu gọn (Mini Sidebar - 80px) giúp mở rộng không gian xem biểu đồ nến TradingView, bảng dữ liệu lớn và tài liệu bài học.
     - Tự động lưu trạng thái thu gọn vào trình duyệt (`localStorage`) để duy trì khi chuyển trang.
@@ -160,31 +176,40 @@ Tất cả tài khoản thử nghiệm bên dưới đều dùng chung mật kh�
          - **Tìm kiếm từ khóa:** Tìm nhanh theo tiêu đề và nội dung thắc mắc.
        - Thẻ hiển thị trực quan thông tin người hỏi, badge phạm vi bài học, badge trạng thái đã/chưa giải đáp, số lượt phản hồi, ảnh thumbnail và link vào trang thảo luận chi tiết `/student/questions/{id}`.
 
-4. **Thư Viện Bài Tập & Câu Hỏi Tiêu Biểu - Showcase Mở Rộng (`/student/featured`):**
+4. **Theo Dõi Học Phí & Biên Lai Thanh Toán (`/student/tuition` - Menu "💳 Học phí & Biên lai"):**
+   - **Thẻ trạng thái học phí cá nhân:**
+     - Hiển thị ngày hết hạn học phí (`paid_until`), số ngày còn lại hoặc cảnh báo quá hạn.
+     - Mức học phí hàng tháng và tổng số tiền đã đóng trong quá trình học.
+   - **Thông tin hướng dẫn chuyển khoản:**
+     - Thông tin tài khoản ngân hàng thụ hưởng (Techcombank/MB Bank) kèm cú pháp chuyển khoản chuẩn tự động tạo theo tên và SĐT của học viên.
+   - **Sổ cái biên lai thanh toán:**
+     - Danh sách toàn bộ các lần đã nộp tiền, số tiền, kỳ hạn học phí (từ ngày đến ngày), phương thức và link xem ảnh biên lai xác nhận.
+
+5. **Thư Viện Bài Tập & Câu Hỏi Tiêu Biểu - Showcase Mở Rộng (`/student/featured`):**
    - **Chia sẻ mở toàn diện:** Học viên có thể xem **tất cả bài tập tiêu biểu và câu hỏi tiêu biểu của tất cả các khóa học** trong học viện để học hỏi kinh nghiệm, phương pháp phân tích biểu đồ và cách xử lý tình huống thực chiến xuất sắc từ các bạn học khác.
    - **2 Tab chuyên biệt:**
      - **Tab 1 - 📝 Bài tập tiêu biểu:** Hiển thị card bài làm mẫu, điểm số, phân tích của bạn học, ảnh biểu đồ phóng to được, và đặc biệt là nhận xét lý do vinh danh của Giảng viên.
      - **Tab 2 - ❓ Câu hỏi tiêu biểu:** Xem các thắc mắc hay về kỹ thuật giao dịch, ảnh biểu đồ đính kèm, lời giải đáp chuẩn mực của Giảng viên và lý do Giảng viên bình chọn.
    - **Bộ lọc linh hoạt:** Lọc theo từng khóa học hoặc xem tất cả khóa học trên toàn hệ thống.
 
-5. **Quản Lý Nhật Ký Backtest (`/student/backtests`):**
+6. **Quản Lý Nhật Ký Backtest (`/student/backtests`):**
    - Ghi chép dữ liệu các lệnh luyện tập trong quá khứ (Replay mode).
    - Ghi nhận: Cặp tiền, Khung thời gian, Vị thế Mua/Bán, Giá vào, Cắt lỗ, Chốt lời, Kết quả (Win/Loss), Lý do vào lệnh, Ảnh biểu đồ trước và sau khi chạy.
    - Tự động thống kê số lệnh, tỷ lệ Winrate và tỷ lệ Risk:Reward trung bình của phương pháp.
 
-6. **Quản Lý Lệnh Thực Chiến / Demo (`/student/trades`):**
+7. **Quản Lý Lệnh Thực Chiến / Demo (`/student/trades`):**
    - Sổ tay giao dịch hàng ngày giúp rèn luyện kỷ luật quản lý vốn.
    - Theo dõi trạng thái lệnh: Đang chạy (Pending), Thắng (Win), Thua (Loss), Hòa vốn (Breakeven).
    - Thống kê số pips và số tiền lời/lỗ thực tế.
 
-7. **Thư Viện Mô Hình Mẫu (`/student/model-trades`):**
+8. **Thư Viện Mô Hình Mẫu (`/student/model-trades`):**
    - **Giao diện bảng Table trực quan:** Hiển thị danh sách các case study chọn lọc với ảnh nhỏ, cặp tiền, BUY/SELL, khung thời gian, tên mô hình & lý do vào lệnh.
    - **Bộ lọc nhanh:** Lọc theo cặp tiền tệ quan tâm hoặc lọc theo vị thế BUY / SELL.
    - **Xem ảnh popup modal:** Click vào ảnh biểu đồ để phóng to ngay trên màn hình, xem nhanh tóm tắt lý do setup.
    - **Nút "Xem chi tiết":** Mở trang nghiên cứu chuyên sâu, xem toàn bộ thông số giá Entry, SL, TP, tỷ lệ R:R, checklist điều kiện vào lệnh và lời chú thích giải nghĩa của Giảng viên.
 
-8. **Trung Tâm Thông Báo (Notifications):**
-   - Nhận thông báo tự động khi Giảng viên chấm bài tập, khi bài nộp được vinh danh Tiêu Biểu, hoặc khi Giảng viên giải đáp câu hỏi của mình.
+9. **Trung Tâm Thông Báo (Notifications):**
+   - Nhận thông báo tự động khi Giảng viên xác nhận thu học phí, khi chấm bài tập, khi bài nộp được vinh danh Tiêu Biểu, hoặc khi Giảng viên giải đáp câu hỏi của mình.
    - Đánh dấu đã đọc hoặc xem lại các thông báo cũ.
 
 ---
@@ -197,19 +222,24 @@ Tất cả tài khoản thử nghiệm bên dưới đều dùng chung mật kh�
 | **Chung** | Chuyển hướng sau đăng nhập | `/dashboard` (tự động nhận diện Admin hoặc Student) |
 | **Admin** | Bảng điều khiển quản trị | `/admin/dashboard` |
 | **Admin** | Quản lý học viên | `/admin/students` |
+| **Admin** | **Quản lý học phí & Cảnh báo nợ** | `/admin/tuition` |
+| **Admin** | Ghi nhận thu học phí (1-Click Presets) | `/admin/tuition/create` |
+| **Admin** | Sổ cái lịch sử thu tiền toàn viện | `/admin/tuition/history` |
+| **Admin** | Lịch sử đóng tiền của 1 học viên | `/admin/tuition/students/{id}` |
 | **Admin** | Quản lý khóa học & bài học | `/admin/courses` |
 | **Admin** | **Gộp Quản lý Bài tập & Bài nộp** | `/admin/submissions` hoặc `/admin/assignments` |
 | **Admin** | **Hỏi đáp học viên (Q&A)** | `/admin/questions` |
 | **Admin** | **Quản lý Bài tập & Câu hỏi tiêu biểu (Showcase)** | `/admin/featured` |
 | **Admin** | **Thư viện mô hình mẫu (Dạng Bảng Table)** | `/admin/model-trades` |
-| **Admin** | Thống kê trading toàn học viện | `/admin/trade-stats` |
-| **Admin** | Gửi thông báo | `/admin/notifications` |
-| **Student** | Bảng điều khiển học viên | `/student/dashboard` |
-| **Student** | Danh sách khóa học được cấp quyền | `/student/courses` |
-| **Student** | **Gộp Bài tập & Bài đã nộp** | `/student/assignments` |
-| **Student** | **Bài tập & Câu hỏi tiêu biểu (Showcase)** | `/student/featured` |
-| **Student** | Quản lý nhật ký Backtest | `/student/backtests` |
-| **Student** | Quản lý nhật ký Vào lệnh (Live/Demo) | `/student/trades` |
-| **Student** | **Thư viện mô hình mẫu (Dạng Bảng Table)** | `/student/model-trades` |
-| **Student** | Thông báo cá nhân | `/student/notifications` |
+| **Admin** | Thống kê Trading của học viên | `/admin/trade-stats` |
+| **Admin** | Gửi thông báo đến học viên | `/admin/notifications` |
+| **Student** | Dashboard học viên | `/student/dashboard` |
+| **Student** | Khóa học & Bài giảng được cấp quyền | `/student/courses` |
+| **Student** | **Bài tập & Hỏi đáp (2 Tab)** | `/student/assignments` |
+| **Student** | **Học phí & Biên lai thanh toán** | `/student/tuition` |
+| **Student** | Thư viện Tiêu Biểu (Showcase mở rộng) | `/student/featured` |
+| **Student** | Nhật ký Backtest | `/student/backtests` |
+| **Student** | Nhật ký Vào lệnh (Live & Demo) | `/student/trades` |
+| **Student** | Thư viện Mô hình mẫu | `/student/model-trades` |
+| **Student** | Hộp thư thông báo | `/student/notifications` |
 

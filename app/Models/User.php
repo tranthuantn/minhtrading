@@ -29,6 +29,10 @@ class User extends Authenticatable
         'avatar',
         'bio',
         'is_active',
+        'billing_type',
+        'monthly_tuition_fee',
+        'paid_until',
+        'tuition_notes',
     ];
 
     /**
@@ -52,6 +56,8 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
             'is_active' => 'boolean',
+            'paid_until' => 'date',
+            'monthly_tuition_fee' => 'decimal:2',
         ];
     }
 
@@ -133,6 +139,105 @@ class User extends Authenticatable
     public function lessonQuestions(): HasMany
     {
         return $this->hasMany(LessonQuestion::class);
+    }
+
+    /**
+     * Tuition payments made by this student.
+     */
+    public function tuitionPayments(): HasMany
+    {
+        return $this->hasMany(TuitionPayment::class, 'user_id')->latest();
+    }
+
+    /**
+     * Get computed tuition status info.
+     */
+    public function getTuitionStatusAttribute(): array
+    {
+        $today = now()->startOfDay();
+
+        if ($this->billing_type === 'free') {
+            return [
+                'code' => 'free',
+                'label' => 'Miễn phí',
+                'badge_class' => 'bg-purple-500/10 text-purple-400 border border-purple-500/20',
+                'description' => 'Học bổng / Miễn học phí',
+                'is_overdue' => false,
+                'days' => 0,
+            ];
+        }
+
+        if ($this->billing_type === 'full_course') {
+            return [
+                'code' => 'full_course',
+                'label' => 'Trọn gói cả khóa',
+                'badge_class' => 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20',
+                'description' => 'Đã đóng trọn gói, không cần gia hạn',
+                'is_overdue' => false,
+                'days' => 0,
+            ];
+        }
+
+        if (! $this->paid_until) {
+            return [
+                'code' => 'no_record',
+                'label' => 'Chưa có thông tin nộp',
+                'badge_class' => 'bg-rose-500/10 text-rose-400 border border-rose-500/20',
+                'description' => 'Chưa từng ghi nhận đóng học phí',
+                'is_overdue' => true,
+                'days' => 0,
+            ];
+        }
+
+        $paidUntil = $this->paid_until->copy()->startOfDay();
+
+        // Đang còn hạn
+        if ($paidUntil->gte($today)) {
+            $daysLeft = (int) $today->diffInDays($paidUntil);
+            if ($daysLeft <= 5) {
+                return [
+                    'code' => 'due_soon',
+                    'label' => 'Sắp hết hạn (' . ($daysLeft == 0 ? 'hôm nay' : 'còn ' . $daysLeft . ' ngày') . ')',
+                    'badge_class' => 'bg-amber-500/10 text-amber-400 border border-amber-500/20',
+                    'description' => 'Hạn đến ngày ' . $paidUntil->format('d/m/Y'),
+                    'is_overdue' => false,
+                    'days' => $daysLeft,
+                ];
+            }
+
+            return [
+                'code' => 'active',
+                'label' => 'Đã nộp đủ (còn ' . $daysLeft . ' ngày)',
+                'badge_class' => 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20',
+                'description' => 'Đã đóng đến hết ' . $paidUntil->format('d/m/Y'),
+                'is_overdue' => false,
+                'days' => $daysLeft,
+            ];
+        }
+
+        // Đã quá hạn
+        $overdueDays = (int) $paidUntil->diffInDays($today);
+        if ($overdueDays <= 30) {
+            return [
+                'code' => 'overdue',
+                'label' => 'Chưa nộp tháng này (' . $overdueDays . ' ngày)',
+                'badge_class' => 'bg-rose-500/10 text-rose-400 border border-rose-500/20',
+                'description' => 'Hết hạn từ ' . $paidUntil->format('d/m/Y') . ' (quá hạn ' . $overdueDays . ' ngày)',
+                'is_overdue' => true,
+                'days' => $overdueDays,
+            ];
+        }
+
+        $overdueMonths = max(1, (int) round($overdueDays / 30));
+
+        return [
+            'code' => 'severely_overdue',
+            'label' => 'Nợ ' . $overdueMonths . ' tháng (' . $overdueDays . ' ngày)',
+            'badge_class' => 'bg-red-950/40 text-rose-300 border border-rose-500/40 ring-1 ring-rose-500/30',
+            'description' => 'Nợ từ ' . $paidUntil->format('d/m/Y') . ' (quá hạn ' . $overdueDays . ' ngày)',
+            'is_overdue' => true,
+            'days' => $overdueDays,
+        ];
     }
 
     /**

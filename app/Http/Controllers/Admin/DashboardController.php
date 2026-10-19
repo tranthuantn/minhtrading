@@ -70,13 +70,18 @@ class DashboardController extends Controller
         ->take(5)
         ->values();
 
+        $overdueTuitionCount = User::students()->get()->filter(fn ($s) => $s->tuition_status['is_overdue'])->count();
+        $dueSoonTuitionCount = User::students()->get()->filter(fn ($s) => $s->tuition_status['code'] === 'due_soon')->count();
+
         return view('admin.dashboard', compact(
             'totalStudents',
             'totalCourses',
             'pendingSubmissionsCount',
             'tradeEntriesThisMonth',
             'recentSubmissions',
-            'topStudents'
+            'topStudents',
+            'overdueTuitionCount',
+            'dueSoonTuitionCount'
         ));
     }
 }
